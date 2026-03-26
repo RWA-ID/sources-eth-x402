@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { ReownProvider } from "../components/ReownProvider";
 
 const WORKER_URL =
   process.env.NEXT_PUBLIC_WORKER_URL ?? "https://sources-x402-worker.dmpay.workers.dev";
@@ -54,7 +55,9 @@ export default function RootLayout({
             </a>
           </div>
         </nav>
-        <main className="relative z-10">{children}</main>
+        <main className="relative z-10">
+          <ReownProvider>{children}</ReownProvider>
+        </main>
       </body>
     </html>
   );
