@@ -4,6 +4,87 @@ import { Suspense, useState } from "react";
 import Image from "next/image";
 import { RegisterForm } from "../../components/RegisterForm";
 
+const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL ?? "http://localhost:8787";
+
+function HumanVerificationCheck() {
+  const [address, setAddress] = useState("");
+  const [status, setStatus] = useState<"idle" | "checking" | "verified" | "not-found" | "error">("idle");
+
+  const check = async () => {
+    if (!/^0x[a-fA-F0-9]{40}$/.test(address.trim())) return;
+    setStatus("checking");
+    try {
+      const res = await fetch(`${WORKER_URL}/world/verify?address=${encodeURIComponent(address.trim())}`);
+      const data = await res.json() as { verified: boolean };
+      setStatus(data.verified ? "verified" : "not-found");
+    } catch {
+      setStatus("error");
+    }
+  };
+
+  return (
+    <div className="max-w-3xl mx-auto mb-12">
+      <div className="bg-[#16161f] border border-white/[0.07] rounded-2xl p-6">
+        <div className="flex items-start gap-4">
+          <div className="flex-shrink-0 w-12 h-12 flex items-center justify-center">
+            <Image src="/human-verified.png" alt="Human Verified" width={48} height={48} unoptimized />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-white mb-1">Human Verified badge</h3>
+            <p className="text-sm text-white/40 mb-4">
+              Agents backed by a real World ID human get a verified badge on their listing.
+              Check if your wallet is already registered in the World ID AgentBook.
+            </p>
+
+            {status === "verified" ? (
+              <div className="flex items-center gap-3 px-4 py-3 bg-[#14532d]/40 border border-[#22c55e]/30 rounded-xl">
+                <Image src="/human-verified.png" alt="Human Verified" width={28} height={28} unoptimized />
+                <div>
+                  <div className="text-sm font-semibold text-[#4ade80]">Human Verified</div>
+                  <div className="text-xs text-white/40">Your agent will display the badge automatically when you register.</div>
+                </div>
+              </div>
+            ) : status === "not-found" ? (
+              <div className="px-4 py-3 bg-white/[0.03] border border-white/[0.08] rounded-xl">
+                <div className="text-sm text-white/60 mb-2">Address not found in the AgentBook.</div>
+                <div className="text-xs text-white/35">
+                  To get verified, register your agent wallet via the World ID Agent Kit CLI:
+                </div>
+                <code className="mt-2 block text-xs text-[#4fd8b8] bg-black/30 rounded-lg px-3 py-2 font-mono">
+                  npx @worldcoin/agentkit-cli register {address || "<your-wallet-address>"}
+                </code>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={address}
+                  onChange={(e) => { setAddress(e.target.value); setStatus("idle"); }}
+                  placeholder="0x... your agent wallet address"
+                  className="flex-1 bg-black/20 border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-white/25 focus:outline-none focus:border-[#7c6aff]/50 font-mono"
+                />
+                <button
+                  onClick={check}
+                  disabled={status === "checking" || !/^0x[a-fA-F0-9]{40}$/.test(address.trim())}
+                  className="px-4 py-2 bg-[#7c6aff]/15 hover:bg-[#7c6aff]/25 border border-[#7c6aff]/30 rounded-lg text-sm text-[#a598ff] transition-all disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap"
+                >
+                  {status === "checking" ? "Checking…" : "Check"}
+                </button>
+              </div>
+            )}
+            {status === "error" && <p className="text-xs text-red-400/70 mt-2">Could not reach verification service. Try again.</p>}
+            {(status === "verified" || status === "not-found") && (
+              <button onClick={() => { setAddress(""); setStatus("idle"); }} className="mt-3 text-xs text-white/30 hover:text-white/50 transition-colors">
+                Check a different address
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const CARDS: { img: string; title: string; body: string }[] = [
   {
     img: "/icon-golive.png",
@@ -124,6 +205,8 @@ export default function RegisterPage() {
           Payment via USDC on Base. No account or wallet connection required to pay.
         </p>
       </div>
+
+      <HumanVerificationCheck />
 
       <div id="register-form" className="max-w-lg mx-auto scroll-mt-8">
         {selectedPlan && (

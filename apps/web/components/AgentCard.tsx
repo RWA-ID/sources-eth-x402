@@ -215,6 +215,17 @@ export function AgentCard({ agent, rating, onSelect, selected }: AgentCardProps)
           <span className="font-semibold text-white group-hover:text-[#7c6aff] transition-colors truncate">
             {agent.display_name}
           </span>
+          {agent.human_verified && (
+            <Image
+              src="/human-verified.png"
+              alt="Human Verified"
+              width={18}
+              height={18}
+              className="flex-shrink-0"
+              title="Human Verified by World ID"
+              unoptimized
+            />
+          )}
           {agent.avg_latency_ms && (
             <span className="text-xs text-white/20 flex-shrink-0">
               ~{(agent.avg_latency_ms / 1000).toFixed(1)}s

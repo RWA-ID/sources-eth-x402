@@ -77,6 +77,10 @@ export interface AgentManifest {
   sample_outputs?: string[];
   avg_latency_ms?: number;
 
+  // Human verification (World ID Agent Kit)
+  human_verified?: boolean;
+  world_human_id?: string;
+
   // Metadata
   author_address?: string;
   ipfs_cid: string;

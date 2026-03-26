@@ -11,6 +11,7 @@ import { handleDiscover } from "./routes/discover";
 import { handleDetectPayment } from "./routes/detect-payment";
 import { handleImportAgent } from "./routes/import-agent";
 import { handleRefreshPricing } from "./routes/refresh-pricing";
+import { handleWorldVerify } from "./routes/world-verify";
 
 function cors(response: Response): Response {
   const headers = new Headers(response.headers);
@@ -115,6 +116,11 @@ export default {
     // GET /import-agent — fetch ERC-8004 agent data for register form pre-fill
     if (method === "GET" && path === "/import-agent") {
       return cors(await handleImportAgent(request, env));
+    }
+
+    // GET /world/verify — check if an address is in the World ID AgentBook on Base
+    if (method === "GET" && path === "/world/verify") {
+      return cors(await handleWorldVerify(request, env));
     }
 
     // POST /refresh-pricing — probe agent and update per-service prices in KV

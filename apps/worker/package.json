@@ -9,7 +9,8 @@
   },
   "dependencies": {
     "@coinbase/x402": "^2.1.0",
-    "@sources-eth/agent-manifest": "workspace:*"
+    "@sources-eth/agent-manifest": "workspace:*",
+    "@worldcoin/agentkit": "^0.1.5"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240909.0",

@@ -3,6 +3,7 @@ import type { Env } from "../lib/registry";
 import { storeAgent } from "../lib/registry";
 import { pinJSON, fetchFromIPFS } from "../lib/ipfs";
 import { verifyPayment, markPaymentUsed, buildRegistration402Response } from "../lib/payment";
+import { lookupAgentBook } from "../lib/agentbook";
 
 export async function handleManifest(request: Request, env: Env): Promise<Response> {
   const url = new URL(request.url);
@@ -53,11 +54,19 @@ export async function handleManifest(request: Request, env: Env): Promise<Respon
     }
 
     const now = Date.now();
+
+    // Check AgentBook — human verification is optional but stored if found
+    const agentBook = await lookupAgentBook(body.payment_address!, env.BASE_RPC_URL);
+
     const manifestToPin: AgentManifest = {
       ...(body as AgentManifest),
       registered_at: Math.floor(now / 1000),
       ipfs_cid: "",
       manifest_version: "1.0",
+      ...(agentBook.verified && {
+        human_verified: true,
+        world_human_id: agentBook.humanId,
+      }),
     };
 
     let cid: string;
@@ -113,11 +122,18 @@ export async function handleManifest(request: Request, env: Env): Promise<Respon
   const trialDays = parseInt(env.TRIAL_DURATION_DAYS, 10);
   const trialExpiresAt = now + trialDays * 24 * 60 * 60 * 1000;
 
+  // Check AgentBook — human verification is optional but stored if found
+  const agentBook = await lookupAgentBook(body.payment_address!, env.BASE_RPC_URL);
+
   const manifestToPin: AgentManifest = {
     ...(body as AgentManifest),
     registered_at: Math.floor(now / 1000),
     ipfs_cid: "",
     manifest_version: "1.0",
+    ...(agentBook.verified && {
+      human_verified: true,
+      world_human_id: agentBook.humanId,
+    }),
   };
 
   let cid: string;
@@ -208,8 +224,18 @@ export async function handleRegister(request: Request, env: Env): Promise<Respon
   const now = Date.now();
   const trialDays = parseInt(env.TRIAL_DURATION_DAYS, 10);
 
+  // For autonomous listings: only apply human_verified if the payment_address
+  // is already in the AgentBook. Strip any claimed human_verified from the
+  // manifest CID — an agent cannot self-assert this status.
+  const agentBook = await lookupAgentBook(manifest.payment_address, env.BASE_RPC_URL);
+  const verifiedManifest: AgentManifest = {
+    ...manifest,
+    human_verified: agentBook.verified ? true : undefined,
+    world_human_id: agentBook.verified ? agentBook.humanId : undefined,
+  };
+
   const reg: Registration = {
-    ens: manifest.ens,
+    ens: verifiedManifest.ens,
     tx_hash_trial: cid, // CID as proof for self-registration path
     fee_paid_total: 0,
     status: "trial",
@@ -217,7 +243,7 @@ export async function handleRegister(request: Request, env: Env): Promise<Respon
     trial_expires_at: now + trialDays * 24 * 60 * 60 * 1000,
   };
 
-  await storeAgent(manifest, reg, env.AGENTS_KV);
+  await storeAgent(verifiedManifest, reg, env.AGENTS_KV);
 
   return new Response(
     JSON.stringify({ success: true, ens: manifest.ens }),
