@@ -1,0 +1,18 @@
+{
+  "name": "sources-eth",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@9.0.0",
+  "scripts": {
+    "dev:web": "pnpm --filter web dev",
+    "dev:worker": "pnpm --filter worker dev",
+    "build": "pnpm --filter web build",
+    "deploy:worker": "pnpm --filter worker deploy",
+    "deploy:web": "pnpm --filter web build",
+    "test": "pnpm --filter worker test"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
+}

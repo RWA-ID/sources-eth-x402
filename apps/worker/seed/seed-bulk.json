@@ -1,0 +1,314 @@
+[
+  {
+    "key": "agents:flux-ultra-gen.agents.sources.eth",
+    "value": "{\"name\":\"flux-ultra-gen\",\"display_name\":\"FLUX Ultra\",\"description\":\"Photorealistic image generation using the FLUX.1 Ultra model. Fast, detailed, and accurate to your prompt.\",\"ens\":\"flux-ultra-gen.agents.sources.eth\",\"version\":\"1.0.0\",\"endpoint\":\"https://flux-ultra-gen.xyz/generate\",\"method\":\"POST\",\"price_usd\":0.05,\"payment_address\":\"0x116fC3Bb1E3b48d39718b0D19D286f6B44DC7ED3\",\"payment_chain\":8453,\"payment_token\":\"USDC\",\"category\":\"generative-media\",\"tags\":[\"photorealistic\",\"fast\",\"flux\",\"image-generation\"],\"input\":{\"prompt\":{\"type\":\"string\",\"required\":true,\"maxLength\":1000}},\"output\":{\"type\":\"image\",\"format\":\"png\",\"delivery\":\"url\"},\"ipfs_cid\":\"Qm666c75782d756c7472612d67656e0000000000000000\",\"registered_at\":1771714222,\"manifest_version\":\"1.0\",\"favicon_url\":\"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/FLUX.1_logo.png/240px-FLUX.1_logo.png\"}"
+  },
+  {
+    "key": "registrations:flux-ultra-gen.agents.sources.eth",
+    "value": "{\"ens\":\"flux-ultra-gen.agents.sources.eth\",\"tx_hash_trial\":\"0x666c75782d756c7472612d67656e736565640000000000000000000000000000\",\"fee_paid_total\":49000000,\"status\":\"active\",\"trial_started_at\":1771714222000,\"trial_expires_at\":9999999999999,\"upgraded_at\":1771714222000}"
+  },
+  {
+    "key": "agents:pixeldream.agents.sources.eth",
+    "value": "{\"name\":\"pixeldream\",\"display_name\":\"PixelDream\",\"description\":\"Dreamlike surrealist artwork and concept illustrations generated in seconds using SDXL Turbo.\",\"ens\":\"pixeldream.agents.sources.eth\",\"version\":\"1.0.0\",\"endpoint\":\"https://pixeldream.xyz/generate\",\"method\":\"POST\",\"price_usd\":0.03,\"payment_address\":\"0x116fC3Bb1E3b48d39718b0D19D286f6B44DC7ED3\",\"payment_chain\":8453,\"payment_token\":\"USDC\",\"category\":\"generative-media\",\"tags\":[\"surrealist\",\"illustration\",\"concept-art\",\"sdxl\",\"fast\"],\"input\":{\"prompt\":{\"type\":\"string\",\"required\":true,\"maxLength\":1000}},\"output\":{\"type\":\"image\",\"format\":\"png\",\"delivery\":\"url\"},\"ipfs_cid\":\"Qm706978656c647265616d000000000000000000000000\",\"registered_at\":1771973422,\"manifest_version\":\"1.0\"}"
+  },
+  {
+    "key": "registrations:pixeldream.agents.sources.eth",
+    "value": "{\"ens\":\"pixeldream.agents.sources.eth\",\"tx_hash_trial\":\"0x706978656c647265616d73656564000000000000000000000000000000000000\",\"fee_paid_total\":49000000,\"status\":\"active\",\"trial_started_at\":1771973422000,\"trial_expires_at\":9999999999999,\"upgraded_at\":1771973422000}"
+  },
+  {
+    "key": "agents:code-sage.agents.sources.eth",
+    "value": "{\"name\":\"code-sage\",\"display_name\":\"Code Sage\",\"description\":\"AI code reviewer that catches bugs, suggests improvements, and explains complex logic in plain English.\",\"ens\":\"code-sage.agents.sources.eth\",\"version\":\"1.0.0\",\"endpoint\":\"https://code-sage.xyz/generate\",\"method\":\"POST\",\"price_usd\":0.02,\"payment_address\":\"0x116fC3Bb1E3b48d39718b0D19D286f6B44DC7ED3\",\"payment_chain\":8453,\"payment_token\":\"USDC\",\"category\":\"coding-dev\",\"tags\":[\"code-review\",\"debugging\",\"refactor\",\"typescript\",\"python\"],\"input\":{\"prompt\":{\"type\":\"string\",\"required\":true,\"maxLength\":1000}},\"output\":{\"type\":\"text\",\"format\":\"markdown\",\"delivery\":\"url\"},\"ipfs_cid\":\"Qm636f64652d7361676500000000000000000000000000\",\"registered_at\":1772232622,\"manifest_version\":\"1.0\"}"
+  },
+  {
+    "key": "registrations:code-sage.agents.sources.eth",
+    "value": "{\"ens\":\"code-sage.agents.sources.eth\",\"tx_hash_trial\":\"0x636f64652d736167657365656400000000000000000000000000000000000000\",\"fee_paid_total\":49000000,\"status\":\"active\",\"trial_started_at\":1772232622000,\"trial_expires_at\":9999999999999,\"upgraded_at\":1772232622000}"
+  },
+  {
+    "key": "agents:legalysis.agents.sources.eth",
+    "value": "{\"name\":\"legalysis\",\"display_name\":\"Legalysis\",\"description\":\"Analyzes contracts and legal documents, flags risky clauses, and summarizes key terms in plain language.\",\"ens\":\"legalysis.agents.sources.eth\",\"version\":\"1.0.0\",\"endpoint\":\"https://legalysis.xyz/generate\",\"method\":\"POST\",\"price_usd\":0.15,\"payment_address\":\"0x116fC3Bb1E3b48d39718b0D19D286f6B44DC7ED3\",\"payment_chain\":8453,\"payment_token\":\"USDC\",\"category\":\"legal-ai\",\"tags\":[\"contracts\",\"legal\",\"NDA\",\"compliance\",\"terms\"],\"input\":{\"prompt\":{\"type\":\"string\",\"required\":true,\"maxLength\":1000}},\"output\":{\"type\":\"text\",\"format\":\"markdown\",\"delivery\":\"url\"},\"ipfs_cid\":\"Qm6c6567616c7973697300000000000000000000000000\",\"registered_at\":1772491822,\"manifest_version\":\"1.0\"}"
+  },
+  {
+    "key": "registrations:legalysis.agents.sources.eth",
+    "value": "{\"ens\":\"legalysis.agents.sources.eth\",\"tx_hash_trial\":\"0x6c6567616c797369737365656400000000000000000000000000000000000000\",\"fee_paid_total\":49000000,\"status\":\"active\",\"trial_started_at\":1772491822000,\"trial_expires_at\":9999999999999,\"upgraded_at\":1772491822000}"
+  },
+  {
+    "key": "agents:voicescribe.agents.sources.eth",
+    "value": "{\"name\":\"voicescribe\",\"display_name\":\"VoiceScribe\",\"description\":\"Transcribes audio files to text with speaker diarization and punctuation in under 30 seconds.\",\"ens\":\"voicescribe.agents.sources.eth\",\"version\":\"1.0.0\",\"endpoint\":\"https://voicescribe.xyz/generate\",\"method\":\"POST\",\"price_usd\":0.03,\"payment_address\":\"0x116fC3Bb1E3b48d39718b0D19D286f6B44DC7ED3\",\"payment_chain\":8453,\"payment_token\":\"USDC\",\"category\":\"audio-voice\",\"tags\":[\"transcription\",\"audio\",\"speech-to-text\",\"diarization\",\"whisper\"],\"input\":{\"prompt\":{\"type\":\"string\",\"required\":true,\"maxLength\":1000}},\"output\":{\"type\":\"text\",\"format\":\"json\",\"delivery\":\"url\"},\"ipfs_cid\":\"Qm766f6963657363726962650000000000000000000000\",\"registered_at\":1772751022,\"manifest_version\":\"1.0\"}"
+  },
+  {
+    "key": "registrations:voicescribe.agents.sources.eth",
+    "value": "{\"ens\":\"voicescribe.agents.sources.eth\",\"tx_hash_trial\":\"0x766f696365736372696265736565640000000000000000000000000000000000\",\"fee_paid_total\":49000000,\"status\":\"active\",\"trial_started_at\":1772751022000,\"trial_expires_at\":9999999999999,\"upgraded_at\":1772751022000}"
+  },
+  {
+    "key": "agents:dataweave.agents.sources.eth",
+    "value": "{\"name\":\"dataweave\",\"display_name\":\"DataWeave\",\"description\":\"Upload a CSV and ask questions in plain English — get charts, summaries, and instant insights.\",\"ens\":\"dataweave.agents.sources.eth\",\"version\":\"1.0.0\",\"endpoint\":\"https://dataweave.xyz/generate\",\"method\":\"POST\",\"price_usd\":0.08,\"payment_address\":\"0x116fC3Bb1E3b48d39718b0D19D286f6B44DC7ED3\",\"payment_chain\":8453,\"payment_token\":\"USDC\",\"category\":\"data-analytics\",\"tags\":[\"csv\",\"analytics\",\"charts\",\"data\",\"insights\"],\"input\":{\"prompt\":{\"type\":\"string\",\"required\":true,\"maxLength\":1000}},\"output\":{\"type\":\"data\",\"format\":\"json\",\"delivery\":\"url\"},\"ipfs_cid\":\"Qm64617461776561766500000000000000000000000000\",\"registered_at\":1773010222,\"manifest_version\":\"1.0\"}"
+  },
+  {
+    "key": "registrations:dataweave.agents.sources.eth",
+    "value": "{\"ens\":\"dataweave.agents.sources.eth\",\"tx_hash_trial\":\"0x6461746177656176657365656400000000000000000000000000000000000000\",\"fee_paid_total\":49000000,\"status\":\"active\",\"trial_started_at\":1773010222000,\"trial_expires_at\":9999999999999,\"upgraded_at\":1773010222000}"
+  },
+  {
+    "key": "agents:pencraft.agents.sources.eth",
+    "value": "{\"name\":\"pencraft\",\"display_name\":\"PenCraft\",\"description\":\"SEO-optimized blog posts, product descriptions, and ad copy written in your brand voice.\",\"ens\":\"pencraft.agents.sources.eth\",\"version\":\"1.0.0\",\"endpoint\":\"https://pencraft.xyz/generate\",\"method\":\"POST\",\"price_usd\":0.04,\"payment_address\":\"0x116fC3Bb1E3b48d39718b0D19D286f6B44DC7ED3\",\"payment_chain\":8453,\"payment_token\":\"USDC\",\"category\":\"text-content\",\"tags\":[\"SEO\",\"copywriting\",\"blog\",\"content\",\"marketing\"],\"input\":{\"prompt\":{\"type\":\"string\",\"required\":true,\"maxLength\":1000}},\"output\":{\"type\":\"text\",\"format\":\"markdown\",\"delivery\":\"url\"},\"ipfs_cid\":\"Qm70656e63726166740000000000000000000000000000\",\"registered_at\":1773269422,\"manifest_version\":\"1.0\"}"
+  },
+  {
+    "key": "registrations:pencraft.agents.sources.eth",
+    "value": "{\"ens\":\"pencraft.agents.sources.eth\",\"tx_hash_trial\":\"0x70656e6372616674736565640000000000000000000000000000000000000000\",\"fee_paid_total\":49000000,\"status\":\"active\",\"trial_started_at\":1773269422000,\"trial_expires_at\":9999999999999,\"upgraded_at\":1773269422000}"
+  },
+  {
+    "key": "agents:auditron.agents.sources.eth",
+    "value": "{\"name\":\"auditron\",\"display_name\":\"Auditron\",\"description\":\"Static analysis and vulnerability scanner for Solidity smart contracts with line-level findings.\",\"ens\":\"auditron.agents.sources.eth\",\"version\":\"1.0.0\",\"endpoint\":\"https://auditron.xyz/generate\",\"method\":\"POST\",\"price_usd\":0.25,\"payment_address\":\"0x116fC3Bb1E3b48d39718b0D19D286f6B44DC7ED3\",\"payment_chain\":8453,\"payment_token\":\"USDC\",\"category\":\"security-compliance\",\"tags\":[\"solidity\",\"smart-contracts\",\"security\",\"audit\",\"EVM\"],\"input\":{\"prompt\":{\"type\":\"string\",\"required\":true,\"maxLength\":1000}},\"output\":{\"type\":\"text\",\"format\":\"json\",\"delivery\":\"url\"},\"ipfs_cid\":\"Qm6175646974726f6e0000000000000000000000000000\",\"registered_at\":1773528622,\"manifest_version\":\"1.0\"}"
+  },
+  {
+    "key": "registrations:auditron.agents.sources.eth",
+    "value": "{\"ens\":\"auditron.agents.sources.eth\",\"tx_hash_trial\":\"0x6175646974726f6e736565640000000000000000000000000000000000000000\",\"fee_paid_total\":49000000,\"status\":\"active\",\"trial_started_at\":1773528622000,\"trial_expires_at\":9999999999999,\"upgraded_at\":1773528622000}"
+  },
+  {
+    "key": "agents:briefbot.agents.sources.eth",
+    "value": "{\"name\":\"briefbot\",\"display_name\":\"BriefBot\",\"description\":\"Paste a meeting transcript or document and get a structured summary with action items in seconds.\",\"ens\":\"briefbot.agents.sources.eth\",\"version\":\"1.0.0\",\"endpoint\":\"https://briefbot.xyz/generate\",\"method\":\"POST\",\"price_usd\":0.02,\"payment_address\":\"0x116fC3Bb1E3b48d39718b0D19D286f6B44DC7ED3\",\"payment_chain\":8453,\"payment_token\":\"USDC\",\"category\":\"workflow-automation\",\"tags\":[\"summarize\",\"meetings\",\"transcripts\",\"action-items\",\"productivity\"],\"input\":{\"prompt\":{\"type\":\"string\",\"required\":true,\"maxLength\":1000}},\"output\":{\"type\":\"text\",\"format\":\"markdown\",\"delivery\":\"url\"},\"ipfs_cid\":\"Qm6272696566626f740000000000000000000000000000\",\"registered_at\":1773787822,\"manifest_version\":\"1.0\"}"
+  },
+  {
+    "key": "registrations:briefbot.agents.sources.eth",
+    "value": "{\"ens\":\"briefbot.agents.sources.eth\",\"tx_hash_trial\":\"0x6272696566626f74736565640000000000000000000000000000000000000000\",\"fee_paid_total\":49000000,\"status\":\"active\",\"trial_started_at\":1773787822000,\"trial_expires_at\":9999999999999,\"upgraded_at\":1773787822000}"
+  },
+  {
+    "key": "agents:tradescout.agents.sources.eth",
+    "value": "{\"name\":\"tradescout\",\"display_name\":\"TradeScout\",\"description\":\"Market sentiment analysis and risk scoring for any crypto token or equity ticker using on-chain and social signals.\",\"ens\":\"tradescout.agents.sources.eth\",\"version\":\"1.0.0\",\"endpoint\":\"https://tradescout.xyz/generate\",\"method\":\"POST\",\"price_usd\":0.1,\"payment_address\":\"0x116fC3Bb1E3b48d39718b0D19D286f6B44DC7ED3\",\"payment_chain\":8453,\"payment_token\":\"USDC\",\"category\":\"payments-finance\",\"tags\":[\"trading\",\"sentiment\",\"crypto\",\"finance\",\"risk\"],\"input\":{\"prompt\":{\"type\":\"string\",\"required\":true,\"maxLength\":1000}},\"output\":{\"type\":\"data\",\"format\":\"json\",\"delivery\":\"url\"},\"ipfs_cid\":\"Qm747261646573636f7574000000000000000000000000\",\"registered_at\":1774047022,\"manifest_version\":\"1.0\"}"
+  },
+  {
+    "key": "registrations:tradescout.agents.sources.eth",
+    "value": "{\"ens\":\"tradescout.agents.sources.eth\",\"tx_hash_trial\":\"0x747261646573636f757473656564000000000000000000000000000000000000\",\"fee_paid_total\":49000000,\"status\":\"active\",\"trial_started_at\":1774047022000,\"trial_expires_at\":9999999999999,\"upgraded_at\":1774047022000}"
+  },
+  {
+    "key": "agents:list:all",
+    "value": "[\"flux-ultra-gen.agents.sources.eth\",\"pixeldream.agents.sources.eth\",\"code-sage.agents.sources.eth\",\"legalysis.agents.sources.eth\",\"voicescribe.agents.sources.eth\",\"dataweave.agents.sources.eth\",\"pencraft.agents.sources.eth\",\"auditron.agents.sources.eth\",\"briefbot.agents.sources.eth\",\"tradescout.agents.sources.eth\"]"
+  },
+  {
+    "key": "agents:list:generative-media",
+    "value": "[\"flux-ultra-gen.agents.sources.eth\",\"pixeldream.agents.sources.eth\"]"
+  },
+  {
+    "key": "agents:list:coding-dev",
+    "value": "[\"code-sage.agents.sources.eth\"]"
+  },
+  {
+    "key": "agents:list:legal-ai",
+    "value": "[\"legalysis.agents.sources.eth\"]"
+  },
+  {
+    "key": "agents:list:audio-voice",
+    "value": "[\"voicescribe.agents.sources.eth\"]"
+  },
+  {
+    "key": "agents:list:data-analytics",
+    "value": "[\"dataweave.agents.sources.eth\"]"
+  },
+  {
+    "key": "agents:list:text-content",
+    "value": "[\"pencraft.agents.sources.eth\"]"
+  },
+  {
+    "key": "agents:list:security-compliance",
+    "value": "[\"auditron.agents.sources.eth\"]"
+  },
+  {
+    "key": "agents:list:workflow-automation",
+    "value": "[\"briefbot.agents.sources.eth\"]"
+  },
+  {
+    "key": "agents:list:payments-finance",
+    "value": "[\"tradescout.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:photorealistic",
+    "value": "[\"flux-ultra-gen.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:fast",
+    "value": "[\"flux-ultra-gen.agents.sources.eth\",\"pixeldream.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:flux",
+    "value": "[\"flux-ultra-gen.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:image-generation",
+    "value": "[\"flux-ultra-gen.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:surrealist",
+    "value": "[\"pixeldream.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:illustration",
+    "value": "[\"pixeldream.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:concept-art",
+    "value": "[\"pixeldream.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:sdxl",
+    "value": "[\"pixeldream.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:code-review",
+    "value": "[\"code-sage.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:debugging",
+    "value": "[\"code-sage.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:refactor",
+    "value": "[\"code-sage.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:typescript",
+    "value": "[\"code-sage.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:python",
+    "value": "[\"code-sage.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:contracts",
+    "value": "[\"legalysis.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:legal",
+    "value": "[\"legalysis.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:nda",
+    "value": "[\"legalysis.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:compliance",
+    "value": "[\"legalysis.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:terms",
+    "value": "[\"legalysis.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:transcription",
+    "value": "[\"voicescribe.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:audio",
+    "value": "[\"voicescribe.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:speech-to-text",
+    "value": "[\"voicescribe.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:diarization",
+    "value": "[\"voicescribe.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:whisper",
+    "value": "[\"voicescribe.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:csv",
+    "value": "[\"dataweave.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:analytics",
+    "value": "[\"dataweave.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:charts",
+    "value": "[\"dataweave.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:data",
+    "value": "[\"dataweave.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:insights",
+    "value": "[\"dataweave.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:seo",
+    "value": "[\"pencraft.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:copywriting",
+    "value": "[\"pencraft.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:blog",
+    "value": "[\"pencraft.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:content",
+    "value": "[\"pencraft.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:marketing",
+    "value": "[\"pencraft.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:solidity",
+    "value": "[\"auditron.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:smart-contracts",
+    "value": "[\"auditron.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:security",
+    "value": "[\"auditron.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:audit",
+    "value": "[\"auditron.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:evm",
+    "value": "[\"auditron.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:summarize",
+    "value": "[\"briefbot.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:meetings",
+    "value": "[\"briefbot.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:transcripts",
+    "value": "[\"briefbot.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:action-items",
+    "value": "[\"briefbot.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:productivity",
+    "value": "[\"briefbot.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:trading",
+    "value": "[\"tradescout.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:sentiment",
+    "value": "[\"tradescout.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:crypto",
+    "value": "[\"tradescout.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:finance",
+    "value": "[\"tradescout.agents.sources.eth\"]"
+  },
+  {
+    "key": "tags:risk",
+    "value": "[\"tradescout.agents.sources.eth\"]"
+  }
+]

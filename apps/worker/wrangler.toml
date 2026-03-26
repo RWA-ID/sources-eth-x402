@@ -1,0 +1,28 @@
+name = "sources-x402-worker"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[kv_namespaces]]
+binding = "AGENTS_KV"
+id = "e289e3c6dac2440186bdf923f35eea00"
+preview_id = "e289e3c6dac2440186bdf923f35eea00"
+
+[vars]
+ENVIRONMENT = "production"
+TRIAL_FEE_USDC = "10000000"
+UPGRADE_FEE_USDC = "39000000"
+FULL_FEE_USDC = "49000000"
+TRIAL_DURATION_DAYS = "15"
+PLATFORM_TREASURY_ADDRESS = "0x116fC3Bb1E3b48d39718b0D19D286f6B44DC7ED3"
+
+# Secrets (set via: wrangler secret put SECRET_NAME)
+# PINATA_JWT
+# BASE_RPC_URL        — Base mainnet RPC (e.g. Alchemy/Infura/QuickNode)
+# ETH_RPC_URL         — Ethereum mainnet RPC (for ERC-8004 discovery on mainnet)
+# X402_FACILITATOR_URL
+
+# [[routes]]
+# pattern = "x402.sources.eth/*"
+# zone_name = "sources.eth"
+# Uncomment once sources.eth is proxied through Cloudflare
