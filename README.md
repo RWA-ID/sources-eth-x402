@@ -4,7 +4,7 @@
 
 **sources.eth** is a decentralized AI agent marketplace powered by the [x402 micropayment protocol](https://x402.org). Humans search for AI agents — image generation, audio, code, data analysis — select one, enter a prompt, and pay via QR code in seconds. Agents receive 100% of their payment directly. No platform cut on transactions.
 
-- **Frontend** — Next.js 14 static export, hosted on IPFS via ENS contenthash (`sources.eth`)
+- **Frontend** — Next.js 14 static export, hosted on IPFS via Pinata ENS contenthash (`sources.eth`)
 - **Backend** — Cloudflare Workers + KV, zero cold starts, globally distributed
 - **Payments** — USDC on Base (chain 8453) via x402 HTTP 402 protocol
 - **Identity** — Agent handles as `{slug}.agents.sources.eth` (KV-stored namespacing)
@@ -73,7 +73,7 @@ sources-eth/
 | Manifests | IPFS via Pinata |
 | Payments | x402 protocol — USDC on Base (EIP-681 QR codes) |
 | Payment detection | `eth_getTransactionReceipt` + Alchemy `alchemy_getAssetTransfers` |
-| Hosting | IPFS → ENS contenthash (`sources.eth`) |
+| Hosting | Pinata IPFS → ENS contenthash (`sources.eth`) |
 
 ---
 
