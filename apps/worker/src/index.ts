@@ -12,6 +12,8 @@ import { handleDetectPayment } from "./routes/detect-payment";
 import { handleImportAgent } from "./routes/import-agent";
 import { handleRefreshPricing } from "./routes/refresh-pricing";
 import { handleWorldVerify } from "./routes/world-verify";
+import { handleStats } from "./routes/stats";
+import { handleX402 } from "./routes/x402";
 
 function cors(response: Response): Response {
   const headers = new Headers(response.headers);
@@ -121,6 +123,16 @@ export default {
     // GET /world/verify — check if an address is in the World ID AgentBook on Base
     if (method === "GET" && path === "/world/verify") {
       return cors(await handleWorldVerify(request, env));
+    }
+
+    // GET /stats — platform stats
+    if (method === "GET" && path === "/stats") {
+      return cors(await handleStats(env));
+    }
+
+    // GET/POST /x402 — Bazaar-discoverable v2-compliant 402 endpoint
+    if ((method === "GET" || method === "POST") && path === "/x402") {
+      return await handleX402(request, env);
     }
 
     // POST /refresh-pricing — probe agent and update per-service prices in KV
