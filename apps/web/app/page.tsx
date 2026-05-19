@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import type { AgentManifest, AgentRating } from "@sources-eth/agent-manifest";
 import { SearchBar } from "../components/SearchBar";
 import { AgentCard, Erc8004AgentCard } from "../components/AgentCard";
 import { InlineAgentPanel } from "../components/InlineAgentPanel";
 import { Erc8004AgentPanel } from "../components/Erc8004AgentPanel";
-import { searchAgents, discoverAgents, getRating, getAgent } from "../lib/api";
-import type { Erc8004Agent } from "../lib/api";
+import { searchAgents, discoverAgents, getRating, getAgent, getStats } from "../lib/api";
+import type { Erc8004Agent, PlatformStats } from "../lib/api";
 
 const SHORTCUTS = [
   { label: "Generative Media", q: "generative media image video" },
@@ -25,6 +25,11 @@ export default function Home() {
   const [searched, setSearched] = useState(false);
   const [selectedAgent, setSelectedAgent] = useState<AgentManifest | null>(null);
   const [selectedErc8004, setSelectedErc8004] = useState<Erc8004Agent | null>(null);
+  const [stats, setStats] = useState<PlatformStats | null>(null);
+
+  useEffect(() => {
+    getStats().then(setStats).catch(() => {});
+  }, []);
 
   const handleSearch = useCallback(async (q: string) => {
     if (!q.trim()) {
@@ -88,6 +93,7 @@ export default function Home() {
       {/* Hero — vertically centered when not searching, compact when results show */}
       <div className={`flex flex-col items-center w-full ${!searched ? "min-h-[75vh] justify-center pb-8" : "pt-16 pb-6"}`}>
         <div className="text-center mb-6">
+          <p className="text-xs font-light tracking-[0.2em] text-white/60 uppercase mb-3">x402 Marketplace</p>
           <h1 className="text-5xl sm:text-7xl font-bold tracking-tight leading-tight mb-4">
             Anything You Need,{" "}
             <span className="text-[#7c6aff]">For Pennies.</span>
@@ -117,6 +123,28 @@ export default function Home() {
           </div>
         )}
 
+        {/* Platform stats */}
+        {!searched && stats && (
+          <div className="flex items-center gap-6 mt-6 text-center">
+            <div>
+              <div className="text-lg font-semibold text-white">{stats.permanent_agents.toLocaleString()}</div>
+              <div className="text-xs text-white/30 tracking-wide">Permanent Agents</div>
+            </div>
+            <div className="w-px h-8 bg-white/[0.07]" />
+            <div>
+              <div className="text-lg font-semibold text-white">{stats.total_transactions.toLocaleString()}</div>
+              <div className="text-xs text-white/30 tracking-wide">Paid Requests</div>
+            </div>
+            <div className="w-px h-8 bg-white/[0.07]" />
+            <div>
+              <div className="text-lg font-semibold text-[#4fd8b8]">
+                ${(stats.total_usdc_volume / 1_000_000).toFixed(2)}
+              </div>
+              <div className="text-xs text-white/30 tracking-wide">USDC Processed</div>
+            </div>
+          </div>
+        )}
+
         {/* Below-search tagline */}
         {!searched && (
           <div className="text-center mt-14">
@@ -125,6 +153,73 @@ export default function Home() {
             </p>
             <p className="text-white/40 text-sm max-w-lg mx-auto leading-relaxed">
               Search, scan a QR code, send USDC on Base, and get your result. No accounts, no API keys, no wallet setup.
+            </p>
+          </div>
+        )}
+
+        {/* x402 Foundation backers */}
+        {!searched && (
+          <div className="w-full max-w-4xl mt-16">
+            <p className="text-center text-xs font-light tracking-[0.2em] text-white/40 uppercase mb-6">
+              x402 Foundation Supported By
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-6">
+              {[
+                { name: "Google", src: "/logos/google.svg", h: "h-7" },
+                { name: "AWS", src: "/logos/aws.svg", h: "h-8" },
+                { name: "Cloudflare", src: "/logos/cloudflare.svg", h: "h-7" },
+                { name: "Stripe", src: "/logos/stripe.svg", h: "h-7" },
+                { name: "Base", src: "/logos/base.svg", h: "h-7" },
+              ].map((logo) => (
+                <img
+                  key={logo.name}
+                  src={logo.src}
+                  alt={logo.name}
+                  className={`${logo.h} w-auto opacity-60 hover:opacity-100 transition-opacity`}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* sources.eth Ecosystem Partners */}
+        {!searched && (
+          <div className="w-full max-w-5xl mt-16 mb-8">
+            <div className="text-center mb-6">
+              <p className="text-xs font-light tracking-[0.2em] text-white/40 uppercase mb-2">
+                Ecosystem Partners
+              </p>
+              <h2 className="text-2xl sm:text-3xl font-semibold text-white/90">
+                Building on sources.eth
+              </h2>
+            </div>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              {[1, 2, 3, 4].map((i) => (
+                <a
+                  key={i}
+                  href="mailto:hector.morel809@gmail.com?subject=sources.eth%20Ecosystem%20Partner"
+                  className="group block bg-white/[0.03] hover:bg-[#7c6aff]/[0.06] border border-white/[0.07] hover:border-[#7c6aff]/30 rounded-xl p-5 transition-all"
+                >
+                  <div className="h-10 w-10 rounded-lg bg-white/[0.04] border border-white/[0.05] mb-3 flex items-center justify-center text-white/30 text-xs font-mono">
+                    {i}
+                  </div>
+                  <div className="text-sm font-medium text-white/60 group-hover:text-white/90 mb-1">
+                    Your brand here
+                  </div>
+                  <div className="text-xs text-white/30 leading-relaxed">
+                    Sponsor slot — reach builders and users paying for AI agents.
+                  </div>
+                </a>
+              ))}
+            </div>
+            <p className="text-center text-xs text-white/30 mt-4">
+              Interested in sponsoring?{" "}
+              <a
+                href="mailto:hector.morel809@gmail.com?subject=sources.eth%20Ecosystem%20Partner"
+                className="text-[#7c6aff] hover:text-[#9a8cff] transition-colors"
+              >
+                Get in touch →
+              </a>
             </p>
           </div>
         )}
