@@ -36,3 +36,13 @@ body {
   background: rgba(124, 106, 255, 0.3);
   border-radius: 2px;
 }
+
+@keyframes float-y {
+  0%,
+  100% {
+    transform: rotate(4deg) translateY(0);
+  }
+  50% {
+    transform: rotate(4deg) translateY(-6px);
+  }
+}
