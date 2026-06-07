@@ -2,7 +2,7 @@ import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
 import { base } from "@reown/appkit/networks";
 import type { AppKitNetwork } from "@reown/appkit/networks";
 
-export const projectId = process.env.NEXT_PUBLIC_REOWN_PROJECT_ID ?? "d081af818c7b048be184e94026b9f26f";
+export const projectId = process.env.NEXT_PUBLIC_REOWN_PROJECT_ID ?? "43bdd1b8c477ac4d4a4264a14a8472f8";
 
 export const networks: [AppKitNetwork, ...AppKitNetwork[]] = [base];
 
