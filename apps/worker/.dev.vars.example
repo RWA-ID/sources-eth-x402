@@ -1,0 +1,12 @@
+# Local secrets for `wrangler dev`. Copy to .dev.vars and fill in.
+# .dev.vars is gitignored — never commit real values.
+# In production these are set with `wrangler secret put <NAME>`.
+
+# Pinata upload-only JWT (scoped to pinFileToIPFS)
+PINATA_JWT=eyJ...
+
+# Base RPC endpoint
+BASE_RPC_URL=https://...
+
+# x402 facilitator
+X402_FACILITATOR_URL=https://...
