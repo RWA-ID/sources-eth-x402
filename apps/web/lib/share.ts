@@ -1,7 +1,7 @@
 import type { AgentManifest, SharePayload, ShareTarget } from "@sources-eth/agent-manifest";
 
 export function buildShareText(payload: SharePayload): Record<ShareTarget, string> {
-  const link = `https://sources.eth.limo/agent/${payload.agentEns}`;
+  const link = `https://sources.eth.limo/agent?ens=${encodeURIComponent(payload.agentEns)}`;
 
   return {
     twitter: `Just generated this with ${payload.agentName} on @sourceseth\nCost me ${payload.price} — no account, no wallet connect, just a QR code\n\nTry it → ${link}`,
@@ -12,7 +12,7 @@ export function buildShareText(payload: SharePayload): Record<ShareTarget, strin
 }
 
 export function buildAgentShareText(manifest: AgentManifest): Record<ShareTarget, string> {
-  const link = `https://sources.eth.limo/agent/${manifest.ens}`;
+  const link = `https://sources.eth.limo/agent?ens=${encodeURIComponent(manifest.ens)}`;
   const price = `$${manifest.price_usd.toFixed(2)}`;
 
   return {

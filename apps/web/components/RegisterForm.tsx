@@ -7,7 +7,10 @@ import { registerManifest, probeAgent, probeAgentOpenApi, importErc8004Agent } f
 import { buildRegistrationMessage } from "@sources-eth/agent-manifest";
 import { useAppKit, useAppKitAccount } from "@reown/appkit/react";
 import { useSignMessage, useChainId, useSwitchChain } from "wagmi";
-import { base } from "@reown/appkit/networks";
+
+/** Base mainnet. Inlined rather than imported from @reown/appkit/networks,
+ *  which pulls its entire chain registry into this page. */
+const BASE_CHAIN_ID = 8453;
 import { HumanVerifyWidget } from "./HumanVerifyWidget";
 import type { ProbeResult, ImportedAgent } from "../lib/api";
 import { AgentShareCard } from "./AgentShareCard";
@@ -317,10 +320,10 @@ export function RegisterForm({ plan = "trial" }: { plan?: Plan }) {
       // The app only declares Base. A wallet on another chain makes AppKit
       // refuse before any signing prompt appears, which reads to the user as
       // "signature rejected" when they were never actually asked.
-      if (chainId !== base.id) {
+      if (chainId !== BASE_CHAIN_ID) {
         try {
           setSigning(true);
-          await switchChainAsync({ chainId: base.id });
+          await switchChainAsync({ chainId: BASE_CHAIN_ID });
         } catch {
           setSubmitError(
             `Your wallet is on chain ${chainId ?? "unknown"}. Switch it to Base (8453) to sign this listing.`

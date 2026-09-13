@@ -397,7 +397,7 @@ function FeaturedAgentCard({ agent }: { agent: AgentManifest }) {
   const label = CATEGORY_LABEL[agent.category] ?? "Other";
   return (
     <a
-      href={`/agent/${agent.ens}`}
+      href={`/agent?ens=${encodeURIComponent(agent.ens)}`}
       className="group flex flex-col gap-4 p-[18px] bg-[#17130f] border border-white/[0.07] hover:border-[#f97316]/30 rounded-2xl transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-20px_rgba(249,115,22,0.22)]"
     >
       <div className="flex items-start justify-between gap-3">

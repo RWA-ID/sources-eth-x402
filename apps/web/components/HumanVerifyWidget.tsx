@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { useAppKit, useAppKitAccount, useDisconnect } from "@reown/appkit/react";
 
@@ -21,6 +21,25 @@ export function HumanVerifyWidget({ compact = false, paymentAddress }: Props) {
   const { disconnect } = useDisconnect();
   const [status, setStatus] = useState<VerifyStatus>("idle");
   const [checkedAddress, setCheckedAddress] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const runCheck = useCallback(async (addr: string) => {
+    setStatus("checking");
+    try {
+      const res = await fetch(`${WORKER_URL}/world/verify?address=${encodeURIComponent(addr)}`);
+      // A failed lookup answers 502. Reading the body regardless would report
+      // a broken verification service as "this person is not a human" — the
+      // same conflation the worker used to make.
+      if (!res.ok) {
+        setStatus("error");
+        return;
+      }
+      const data = (await res.json()) as { verified: boolean };
+      setStatus(data.verified ? "verified" : "not-found");
+    } catch {
+      setStatus("error");
+    }
+  }, []);
 
   useEffect(() => {
     if (!isConnected || !address) {
@@ -30,13 +49,26 @@ export function HumanVerifyWidget({ compact = false, paymentAddress }: Props) {
     }
     if (address === checkedAddress) return;
     setCheckedAddress(address);
-    setStatus("checking");
+    void runCheck(address);
+  }, [isConnected, address, checkedAddress, runCheck]);
 
-    fetch(`${WORKER_URL}/world/verify?address=${encodeURIComponent(address)}`)
-      .then((r) => r.json() as Promise<{ verified: boolean }>)
-      .then((data) => setStatus(data.verified ? "verified" : "not-found"))
-      .catch(() => setStatus("error"));
-  }, [isConnected, address, checkedAddress]);
+  const registerCmd = `npx @worldcoin/agentkit-cli register ${address ?? ""}`;
+
+  const copyCmd = async () => {
+    try {
+      await navigator.clipboard.writeText(registerCmd);
+    } catch {
+      // Clipboard is blocked in some contexts; fall back to a selection.
+      const ta = document.createElement("textarea");
+      ta.value = registerCmd;
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand("copy"); } catch { /* nothing else to try */ }
+      document.body.removeChild(ta);
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1800);
+  };
 
   const addressHint = paymentAddress
     ? `${paymentAddress.slice(0, 6)}…${paymentAddress.slice(-4)}`
@@ -127,21 +159,56 @@ export function HumanVerifyWidget({ compact = false, paymentAddress }: Props) {
               <span className="font-mono text-xs text-white/40 truncate">{address?.slice(0, 10)}…</span>
               <span className="text-xs text-white/25">— not in AgentBook</span>
             </div>
-            <p className="text-xs text-white/35 mb-1.5">Register to get verified:</p>
-            <code className="block text-xs text-[#fdba74] bg-black/30 rounded px-2 py-1.5 font-mono break-all">
-              npx @worldcoin/agentkit-cli register {address}
-            </code>
+            <p className="text-xs text-white/35 mb-1.5">
+              Run this once to link this wallet to your World ID. It opens a World App
+              verification, then registers the wallet on-chain — you only do it once per wallet.
+            </p>
+            <div className="relative">
+              <code className="block text-xs text-[#fdba74] bg-black/30 rounded px-2 py-1.5 pr-16 font-mono break-all">
+                {registerCmd}
+              </code>
+              <button
+                type="button"
+                onClick={copyCmd}
+                aria-label="Copy the registration command"
+                className="absolute top-1 right-1 px-2 py-1 rounded-md bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.08] font-mono text-[10px] text-white/60 hover:text-white transition-colors"
+              >
+                {copied ? "Copied!" : "Copy"}
+              </button>
+            </div>
           </div>
-          <button onClick={() => disconnect()} className="text-xs text-white/25 hover:text-white/45 transition-colors">
-            Try a different wallet
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => address && runCheck(address)}
+              className="px-3 py-1.5 rounded-lg bg-[#f97316]/15 hover:bg-[#f97316]/25 border border-[#f97316]/40 text-xs text-[#fdba74] hover:text-white transition-all font-medium"
+            >
+              Check again
+            </button>
+            <span className="text-[11px] text-white/25">after running the command</span>
+            <button onClick={() => disconnect()} className="ml-auto text-xs text-white/25 hover:text-white/45 transition-colors">
+              Try a different wallet
+            </button>
+          </div>
         </div>
       ) : status === "error" ? (
-        <div className="space-y-1">
-          <p className="text-xs text-red-400/70">Could not reach verification service. You can still register.</p>
-          <button onClick={() => disconnect()} className="text-xs text-white/25 hover:text-white/45 transition-colors">
-            Disconnect
-          </button>
+        <div className="space-y-1.5">
+          <p className="text-xs text-red-400/70">
+            Could not reach the verification service — this is not a verdict on your wallet.
+            You can still list your agent without the badge.
+          </p>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => address && runCheck(address)}
+              className="px-3 py-1.5 rounded-lg bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.10] text-xs text-white/70 hover:text-white transition-all font-medium"
+            >
+              Retry
+            </button>
+            <button onClick={() => disconnect()} className="text-xs text-white/25 hover:text-white/45 transition-colors">
+              Disconnect
+            </button>
+          </div>
         </div>
       ) : null}
     </>
