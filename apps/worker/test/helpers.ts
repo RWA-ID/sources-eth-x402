@@ -45,6 +45,7 @@ export function makeEnv(kv: FakeKV = new FakeKV()): Env {
     PINATA_JWT: "test-jwt",
     BASE_RPC_URL: "https://base.example/rpc",
     ETH_RPC_URL: "https://eth.example/rpc",
+    WORLD_RPC_URL: "https://worldchain.example/rpc",
     X402_FACILITATOR_URL: "https://facilitator.example",
     PLATFORM_TREASURY_ADDRESS: TREASURY,
     TRIAL_FEE_USDC: "10000000",

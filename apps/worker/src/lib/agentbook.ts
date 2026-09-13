@@ -1,66 +1,52 @@
+import { createAgentBookVerifier } from "@worldcoin/agentkit";
+
 /**
- * AgentBook lookup — checks if a wallet address is registered as a
- * human-verified agent via the World ID Agent Kit on Base mainnet.
+ * AgentBook lookup — resolves a wallet address to an anonymous World ID human.
  *
- * We call the AgentBook contract directly via eth_call to avoid
- * Node.js-specific runtime dependencies in the Cloudflare Worker.
+ * This used to be a hand-rolled eth_call against `humanOf(address)` on Base.
+ * The on-chain function is actually `lookupHuman(address) -> uint256`, so every
+ * call reverted, the revert was swallowed, and the Human Verified badge read
+ * "not verified" for every agent from the day it shipped. Nobody noticed
+ * because it failed open and a failed lookup was indistinguishable from an
+ * honest negative.
  *
- * AgentBook on Base: 0xE1D1D3526A6FAa37eb36bD10B933C1b77f4561a4
- * Function: humanOf(address payable) → bytes32
- *   Returns the humanId (non-zero bytes32) if registered, zero bytes32 if not.
+ * Use the SDK. The ABI, the deployment addresses and the chain-resolution
+ * rules are theirs to change — AgentKit is still Beta — and hand-copying any
+ * of the three is what broke it.
  */
 
-const AGENTBOOK_BASE = "0xE1D1D3526A6FAa37eb36bD10B933C1b77f4561a4";
-
-// keccak256("humanOf(address)") = first 4 bytes
-// Precomputed: 0x1b9265b8
-const HUMAN_OF_SELECTOR = "0x1b9265b8";
-
-function encodeAddress(address: string): string {
-  // ABI encode address: 12 zero bytes + 20-byte address (32 bytes total)
-  return address.replace(/^0x/, "").toLowerCase().padStart(64, "0");
-}
-
-function isNonZeroBytes32(hex: string): boolean {
-  return /[1-9a-f]/.test(hex.replace(/^0x/, ""));
-}
+/** Lookup resolves against the canonical World Chain deployment. */
+const WORLD_MAINNET = "eip155:480";
 
 export interface AgentBookResult {
   verified: boolean;
   humanId?: string;
+  /**
+   * Set only when the lookup could not be completed. `verified: false` with no
+   * error means a real answer: this address is not registered. Keeping the two
+   * apart is the whole point — conflating them is what hid the outage.
+   */
+  error?: string;
 }
 
 export async function lookupAgentBook(
   address: string,
-  rpcUrl: string
+  rpcUrl?: string
 ): Promise<AgentBookResult> {
   try {
-    const calldata = HUMAN_OF_SELECTOR + encodeAddress(address);
+    const agentBook = createAgentBookVerifier(rpcUrl ? { rpcUrl } : {});
+    const humanId = await agentBook.lookupHuman(address, WORLD_MAINNET);
 
-    const res = await fetch(rpcUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        jsonrpc: "2.0",
-        method: "eth_call",
-        params: [
-          { to: AGENTBOOK_BASE, data: calldata },
-          "latest",
-        ],
-        id: 1,
-      }),
-      signal: AbortSignal.timeout(8_000),
-    });
-
-    const data = await res.json() as { result?: string; error?: unknown };
-
-    if (!data.result || !isNonZeroBytes32(data.result)) {
+    if (!humanId || /^0x0*$/.test(humanId)) {
       return { verified: false };
     }
-
-    return { verified: true, humanId: data.result };
-  } catch {
-    // Network failure or timeout — fail open (don't block registration)
-    return { verified: false };
+    return { verified: true, humanId };
+  } catch (e) {
+    // Still non-blocking: the badge is optional enrichment, not access
+    // control, so a lookup failure must never stop someone listing an agent.
+    // But it is now reported rather than silently becoming "not a human".
+    const error = e instanceof Error ? e.message.slice(0, 200) : "lookup failed";
+    console.error("AgentBook lookup failed", { address, error });
+    return { verified: false, error };
   }
 }

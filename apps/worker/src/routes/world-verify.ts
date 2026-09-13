@@ -9,8 +9,12 @@ export async function handleWorldVerify(request: Request, env: Env): Promise<Res
     return json({ error: "address param required (must be a valid 0x Ethereum address)" }, 400);
   }
 
-  const result = await lookupAgentBook(address, env.BASE_RPC_URL);
+  const result = await lookupAgentBook(address, env.WORLD_RPC_URL);
 
+  // A failed lookup is reported as such, not as "not a human".
+  if (result.error) {
+    return json({ address, verified: false, humanId: null, error: result.error }, 502);
+  }
   return json({ address, verified: result.verified, humanId: result.humanId ?? null });
 }
 

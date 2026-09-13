@@ -15,6 +15,10 @@ UPGRADE_FEE_USDC = "39000000"
 FULL_FEE_USDC = "49000000"
 TRIAL_DURATION_DAYS = "15"
 PLATFORM_TREASURY_ADDRESS = "0x116fC3Bb1E3b48d39718b0D19D286f6B44DC7ED3"
+# AgentBook lookups resolve on World Chain (eip155:480), never on Base.
+# Public endpoint by default; replace with a keyed URL via `wrangler secret put
+# WORLD_RPC_URL` if throttling shows up — public RPCs rate-limit Workers hard.
+WORLD_RPC_URL = "https://worldchain-mainnet.g.alchemy.com/public"
 
 # Secrets (set via: wrangler secret put SECRET_NAME)
 # PINATA_JWT

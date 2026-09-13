@@ -69,7 +69,7 @@ export async function handleManifest(request: Request, env: Env): Promise<Respon
     const now = Date.now();
 
     // Check AgentBook — human verification is optional but stored if found
-    const agentBook = await lookupAgentBook(body.payment_address!, env.BASE_RPC_URL);
+    const agentBook = await lookupAgentBook(body.payment_address!, env.WORLD_RPC_URL);
 
     const manifestToPin: AgentManifest = {
       ...(stripOwnerSignature(body) as AgentManifest),
@@ -154,7 +154,7 @@ export async function handleManifest(request: Request, env: Env): Promise<Respon
   const trialExpiresAt = now + trialDays * 24 * 60 * 60 * 1000;
 
   // Check AgentBook — human verification is optional but stored if found
-  const agentBook = await lookupAgentBook(body.payment_address!, env.BASE_RPC_URL);
+  const agentBook = await lookupAgentBook(body.payment_address!, env.WORLD_RPC_URL);
 
   const manifestToPin: AgentManifest = {
     ...(stripOwnerSignature(body) as AgentManifest),
@@ -260,7 +260,7 @@ export async function handleRegister(request: Request, env: Env): Promise<Respon
   // For autonomous listings: only apply human_verified if the payment_address
   // is already in the AgentBook. Strip any claimed human_verified from the
   // manifest CID — an agent cannot self-assert this status.
-  const agentBook = await lookupAgentBook(manifest.payment_address, env.BASE_RPC_URL);
+  const agentBook = await lookupAgentBook(manifest.payment_address, env.WORLD_RPC_URL);
   const verifiedManifest: AgentManifest = {
     ...manifest,
     human_verified: agentBook.verified ? true : undefined,

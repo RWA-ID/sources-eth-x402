@@ -5,6 +5,8 @@ export interface Env {
   PINATA_JWT: string;
   BASE_RPC_URL: string;
   ETH_RPC_URL: string;
+  /** World Chain RPC — AgentBook lookups resolve on eip155:480, not Base. */
+  WORLD_RPC_URL: string;
   X402_FACILITATOR_URL: string;
   PLATFORM_TREASURY_ADDRESS: string;
   TRIAL_FEE_USDC: string;
