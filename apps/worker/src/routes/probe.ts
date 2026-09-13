@@ -1,4 +1,5 @@
 import type { Env } from "../lib/registry";
+import { assertSafeAgentUrl, UnsafeUrlError, probeFetch } from "../lib/safe-url";
 
 export interface ProbeResult {
   payTo: string;
@@ -98,11 +99,22 @@ export async function handleProbe(request: Request, _env: Env): Promise<Response
   const url = new URL(request.url);
   const apiUrl = url.searchParams.get("url");
 
-  if (!apiUrl || !apiUrl.startsWith("https://")) {
+  if (!apiUrl) {
     return new Response(JSON.stringify({ error: "url param required (must be https://)" }), {
       status: 400,
       headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
     });
+  }
+
+  // Same guard as /probe-openapi: https only, no embedded credentials, no
+  // private or link-local targets, and every probe bounded by a timeout.
+  try {
+    assertSafeAgentUrl(apiUrl, "url param");
+  } catch (e) {
+    return new Response(
+      JSON.stringify({ error: e instanceof UnsafeUrlError ? e.message : "Invalid url param" }),
+      { status: 400, headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } }
+    );
   }
 
   const base = apiUrl.replace(/\/$/, "");
@@ -110,7 +122,7 @@ export async function handleProbe(request: Request, _env: Env): Promise<Response
   // Health check (best-effort)
   let healthy = false;
   try {
-    const h = await fetch(`${base}/health`, { method: "GET" });
+    const h = await probeFetch(`${base}/health`, { method: "GET" });
     healthy = h.ok || h.status === 405;
   } catch {
     // not all agents have /health — that's OK
@@ -119,7 +131,7 @@ export async function handleProbe(request: Request, _env: Env): Promise<Response
   // Fetch pricing
   let pricingData: Record<string, unknown>;
   try {
-    const res = await fetch(`${base}/pricing`, {
+    const res = await probeFetch(`${base}/pricing`, {
       headers: { Accept: "application/json" },
     });
     if (!res.ok) {
