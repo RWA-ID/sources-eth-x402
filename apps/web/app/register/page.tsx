@@ -3,7 +3,8 @@
 import { Suspense, useState } from "react";
 import { RegisterForm } from "../../components/RegisterForm";
 
-type Plan = "trial" | "permanent" | "developer";
+// The $99/yr Developer API key is a separate product with its own flow at /developer.
+type Plan = "trial" | "permanent";
 
 const BULLETS = [
   { t: "Zero-integration listing", d: "One JSON manifest → IPFS → live. No SDK to install." },
@@ -267,7 +268,7 @@ export default function RegisterPage() {
           {selectedPlan && (
             <div className="mb-6 px-4 py-3 bg-[#7c6aff]/10 border border-[#7c6aff]/30 rounded-xl text-sm text-[#a598ff] flex items-center justify-between">
               <span>
-                Plan: <span className="font-medium text-white">{selectedPlan === "trial" ? "Free Trial" : selectedPlan === "permanent" ? "Permanent ($49)" : "Developer API ($99/yr)"}</span>
+                Plan: <span className="font-medium text-white">{selectedPlan === "trial" ? "Free Trial" : "Permanent ($49)"}</span>
               </span>
               <button onClick={() => setSelectedPlan(null)} className="text-white/30 hover:text-white/60 transition-colors text-xs">change</button>
             </div>

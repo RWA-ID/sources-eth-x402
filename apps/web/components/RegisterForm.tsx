@@ -3,12 +3,13 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import type { AgentManifest, AgentCategory, AgentService } from "@sources-eth/agent-manifest";
-import { registerManifest, probeAgent, importErc8004Agent } from "../lib/api";
+import { registerManifest, probeAgent, probeAgentOpenApi, importErc8004Agent } from "../lib/api";
+import { HumanVerifyWidget } from "./HumanVerifyWidget";
 import type { ProbeResult, ImportedAgent } from "../lib/api";
 import { AgentShareCard } from "./AgentShareCard";
 
 type Step = 1 | 2;
-type ImportMode = "json" | "erc8004";
+type ImportMode = "openapi" | "erc8004" | "json";
 
 const CATEGORIES: { id: AgentCategory; label: string }[] = [
   { id: "generative-media", label: "Generative Media (image, video, avatars)" },
@@ -76,10 +77,16 @@ function findApiEndpoint(services: Array<{ name: string; endpoint: string }>): s
   return fallback?.endpoint ?? null;
 }
 
-export function RegisterForm() {
+// Listing plans only. The $99/yr Developer API key is sold separately at /developer.
+type Plan = "trial" | "permanent";
+
+export function RegisterForm({ plan = "trial" }: { plan?: Plan }) {
   const searchParams = useSearchParams();
   const [step, setStep] = useState<Step>(1);
-  const [importMode, setImportMode] = useState<ImportMode>("erc8004");
+  const [importMode, setImportMode] = useState<ImportMode>("openapi");
+
+  // OpenAPI mode
+  const [openApiUrl, setOpenApiUrl] = useState("");
 
   // JSON paste mode
   const [rawJson, setRawJson] = useState("");
@@ -146,6 +153,33 @@ export function RegisterForm() {
       setStep(2);
     } catch (e) {
       setProbeError(e instanceof Error ? e.message : "Probe failed — is your pricing endpoint live?");
+    } finally {
+      setProbing(false);
+    }
+  };
+
+  const handleImportOpenApi = async () => {
+    if (!openApiUrl.trim()) return;
+    setProbeError("");
+    setProbing(true);
+    try {
+      const probe = await probeAgentOpenApi(openApiUrl.trim());
+      const name = probe.display_name?.trim() || new URL(probe.base_url ?? openApiUrl.trim()).hostname;
+      const description = probe.description?.trim() || `Discovered ${probe.services.length} payable endpoint${probe.services.length === 1 ? "" : "s"}.`;
+      const baseUrl = (probe.base_url ?? openApiUrl.trim()).replace(/\/$/, "");
+      const services = probe.services.map((s) => ({ name: s.name, endpoint: s.endpoint }));
+      setParsed({
+        slug: slugify(name),
+        display_name: name,
+        description,
+        endpoint: baseUrl,
+        probe,
+        services,
+      });
+      setDisplayName(name);
+      setStep(2);
+    } catch (e) {
+      setProbeError(e instanceof Error ? e.message : "OpenAPI probe failed — is /openapi.json reachable?");
     } finally {
       setProbing(false);
     }
@@ -242,7 +276,7 @@ export function RegisterForm() {
         ...(agentServices.length > 0 && { services: agentServices }),
       };
 
-      const result = await registerManifest(manifest);
+      const result = await registerManifest(manifest, plan);
       if (!("requires402" in result)) {
         setSuccessManifest({ ...manifest, ipfs_cid: result.cid, registered_at: Date.now() / 1000, manifest_version: "1.0" });
         setTrialExpiresAt(result.trial_expires_at);
@@ -301,13 +335,13 @@ export function RegisterForm() {
           <div>
             <h2 className="text-lg font-semibold mb-1">List your agent</h2>
             <p className="text-sm text-white/40 mb-4">
-              Already have an ERC-8004 agent? Import it in one click. Otherwise paste your metadata JSON.
+              Point us at your <span className="font-mono text-white/60">/openapi.json</span> — same spec used by x402scan and agentic.market. Or import from ERC-8004, or paste JSON.
             </p>
           </div>
 
           {/* Tab switcher */}
           <div className="flex gap-1 p-1 bg-white/[0.04] rounded-lg border border-white/[0.06]">
-            {(["erc8004", "json"] as ImportMode[]).map((mode) => (
+            {(["openapi", "erc8004", "json"] as ImportMode[]).map((mode) => (
               <button
                 key={mode}
                 onClick={() => { setImportMode(mode); setProbeError(""); setImportError(""); }}
@@ -317,10 +351,45 @@ export function RegisterForm() {
                     : "text-white/40 hover:text-white/70"
                 }`}
               >
-                {mode === "erc8004" ? "Import ERC-8004" : "Paste JSON"}
+                {mode === "openapi" ? "OpenAPI" : mode === "erc8004" ? "ERC-8004" : "Paste JSON"}
               </button>
             ))}
           </div>
+
+          {/* OpenAPI import */}
+          {importMode === "openapi" && (
+            <div className="space-y-3">
+              <div className="bg-[#111118] border border-white/[0.06] rounded-lg px-4 py-3 space-y-1.5 text-xs text-white/40">
+                <p className="text-white/60 font-medium mb-1">Your OpenAPI spec needs:</p>
+                <p><span className="font-mono text-[#4fd8b8]">paths.*</span> — every paid route declared</p>
+                <p><span className="font-mono text-[#4fd8b8]">x-payment-info</span> on each paid operation (price + protocols)</p>
+                <p><span className="font-mono text-[#4fd8b8]">x-x402</span> top-level block with <span className="font-mono">payTo</span> + <span className="font-mono">network</span>, OR a live 402 response we can probe</p>
+              </div>
+              <input
+                value={openApiUrl}
+                onChange={(e) => setOpenApiUrl(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleImportOpenApi()}
+                placeholder="https://your-agent.com (we'll find /openapi.json)"
+                className={inputClass}
+                spellCheck={false}
+              />
+              {probeError && (
+                <p className="text-red-400 text-sm bg-red-400/10 border border-red-400/20 rounded-lg px-3 py-2">
+                  {probeError}
+                </p>
+              )}
+              <button
+                onClick={handleImportOpenApi}
+                disabled={!openApiUrl.trim() || probing}
+                className="w-full py-3 bg-[#7c6aff] hover:bg-[#6b59ee] disabled:opacity-40 disabled:cursor-not-allowed rounded-lg font-medium transition-all"
+              >
+                {probing ? "Reading OpenAPI spec..." : "Discover endpoints →"}
+              </button>
+              <p className="text-xs text-center text-white/25">
+                We&apos;ll auto-detect every payable route, price, and your payment address.
+              </p>
+            </div>
+          )}
 
           {/* ERC-8004 import */}
           {importMode === "erc8004" && (
@@ -500,6 +569,11 @@ export function RegisterForm() {
               <div className="font-mono text-xs text-white/50 break-all">{parsed.probe.payTo}</div>
             </div>
 
+            {/* Human Verified check — shown right next to the payment address */}
+            <div className="border-t border-white/[0.07] pt-3">
+              <HumanVerifyWidget compact paymentAddress={parsed.probe.payTo} />
+            </div>
+
             <div className="flex items-center gap-2 text-xs">
               <div className={`w-2 h-2 rounded-full ${parsed.probe.healthy ? "bg-[#4fd8b8]" : "bg-yellow-400"}`} />
               <span className="text-white/30">
@@ -522,15 +596,29 @@ export function RegisterForm() {
             <input value={tags} onChange={(e) => setTags(e.target.value)} placeholder="ipfs, storage, pinning, x402" className={inputClass} />
           </div>
 
-          <div className="bg-[#4fd8b8]/10 border border-[#4fd8b8]/20 rounded-xl p-4 space-y-1">
-            <div className="text-sm font-medium text-[#4fd8b8]">Free 15-day trial</div>
-            <ul className="text-xs text-white/50 space-y-0.5">
-              <li>✓ Fully live in search from day one</li>
-              <li>✓ Real traffic, real payments to your wallet</li>
-              <li>✓ No credit card, no USDC required to start</li>
-              <li className="text-white/30">↑ $49 to go permanent after your trial</li>
-            </ul>
-          </div>
+          {plan === "trial" && (
+            <div className="bg-[#4fd8b8]/10 border border-[#4fd8b8]/20 rounded-xl p-4 space-y-1">
+              <div className="text-sm font-medium text-[#4fd8b8]">Free 15-day trial</div>
+              <ul className="text-xs text-white/50 space-y-0.5">
+                <li>✓ Fully live in search from day one</li>
+                <li>✓ Real traffic, real payments to your wallet</li>
+                <li>✓ No credit card, no USDC required to start</li>
+                <li className="text-white/30">↑ $49 to go permanent after your trial</li>
+              </ul>
+            </div>
+          )}
+
+          {plan === "permanent" && (
+            <div className="bg-[#7c6aff]/10 border border-[#7c6aff]/20 rounded-xl p-4 space-y-1">
+              <div className="text-sm font-medium text-[#a598ff]">Permanent listing — $49 USDC</div>
+              <ul className="text-xs text-white/50 space-y-0.5">
+                <li>✓ Listed permanently, no recurring fees</li>
+                <li>✓ 100% of generation fees go to your wallet</li>
+                <li>✓ Priority for featured placement</li>
+                <li className="text-white/30">Payment via USDC on Base — you will see a QR code</li>
+              </ul>
+            </div>
+          )}
 
           {submitError && <p className="text-red-400 text-sm">{submitError}</p>}
 
@@ -543,7 +631,11 @@ export function RegisterForm() {
               disabled={loading || !category}
               className="flex-1 py-3 bg-[#7c6aff] hover:bg-[#6b59ee] disabled:opacity-40 disabled:cursor-not-allowed rounded-lg font-medium transition-all"
             >
-              {loading ? "Publishing..." : "Publish free trial"}
+              {loading
+                ? "Publishing..."
+                : plan === "permanent"
+                ? "Register permanently — $49"
+                : "Start free trial"}
             </button>
           </div>
         </div>

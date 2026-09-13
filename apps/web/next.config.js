@@ -7,6 +7,14 @@ const nextConfig = {
     trailingSlash: true,
   }),
   images: { unoptimized: true },
+  webpack: (config) => {
+    // These are optional wagmi connector peer deps not needed for our use case
+    config.resolve.alias["porto/internal"] = false;
+    config.resolve.alias["@walletconnect/ethereum-provider"] = false;
+    config.resolve.alias["@coinbase/wallet-sdk"] = false;
+    config.resolve.alias["@metamask/connect-evm"] = false;
+    return config;
+  },
 };
 
 module.exports = nextConfig;

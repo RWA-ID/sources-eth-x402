@@ -35,6 +35,21 @@ export async function probeAgent(apiUrl: string): Promise<ProbeResult> {
   return res.json();
 }
 
+export interface OpenApiProbeResult extends ProbeResult {
+  display_name?: string;
+  description?: string;
+  base_url?: string;
+}
+
+export async function probeAgentOpenApi(apiUrl: string): Promise<OpenApiProbeResult> {
+  const res = await fetch(`${WORKER_URL}/probe-openapi?url=${encodeURIComponent(apiUrl)}`);
+  if (!res.ok) {
+    const err = await res.json() as { error: string };
+    throw new Error(err.error ?? "OpenAPI probe failed");
+  }
+  return res.json();
+}
+
 export async function searchAgents(
   q: string,
   category?: AgentCategory | "all"
@@ -102,9 +117,13 @@ export async function generateWithPayment(
 }
 
 export async function registerManifest(
-  manifest: Omit<AgentManifest, "ipfs_cid" | "registered_at" | "manifest_version">
+  manifest: Omit<AgentManifest, "ipfs_cid" | "registered_at" | "manifest_version">,
+  plan: "trial" | "permanent" = "trial"
 ): Promise<{ requires402: true; paymentRequest: unknown } | { cid: string; ens: string; trial_expires_at: number | null; status: string }> {
-  const res = await fetch(`${WORKER_URL}/manifest`, {
+  const endpoint = plan === "permanent"
+    ? `${WORKER_URL}/manifest?plan=permanent`
+    : `${WORKER_URL}/manifest`;
+  const res = await fetch(endpoint, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(manifest),
@@ -188,5 +207,17 @@ export async function upgradeAgent(
     throw new Error(err.error);
   }
 
+  return res.json();
+}
+
+export interface PlatformStats {
+  permanent_agents: number;
+  total_transactions: number;
+  total_usdc_volume: number;
+}
+
+export async function getStats(): Promise<PlatformStats> {
+  const res = await fetch(`${WORKER_URL}/stats`);
+  if (!res.ok) return { permanent_agents: 0, total_transactions: 0, total_usdc_volume: 0 };
   return res.json();
 }

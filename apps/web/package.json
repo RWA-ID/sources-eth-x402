@@ -9,13 +9,18 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@reown/appkit": "^1.8.19",
+    "@reown/appkit-adapter-wagmi": "^1.8.19",
     "@sources-eth/agent-manifest": "workspace:*",
+    "@tanstack/react-query": "^5.95.2",
+    "clsx": "^2.1.0",
+    "framer-motion": "^11.0.0",
     "next": "^14.2.0",
+    "porto": "^0.2.37",
+    "qrcode": "^1.5.4",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
-    "qrcode": "^1.5.4",
-    "clsx": "^2.1.0",
-    "framer-motion": "^11.0.0"
+    "wagmi": "^3.6.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
