@@ -4,6 +4,7 @@ import { storeAgent } from "../lib/registry";
 import { pinJSON, fetchFromIPFS } from "../lib/ipfs";
 import { verifyPayment, markPaymentUsed, buildRegistration402Response } from "../lib/payment";
 import { lookupAgentBook } from "../lib/agentbook";
+import { isSafeAgentUrl } from "../lib/safe-url";
 import { incrementStat } from "./stats";
 
 export async function handleManifest(request: Request, env: Env): Promise<Response> {
@@ -379,8 +380,22 @@ function validateManifest(body: Partial<AgentManifest>): string | null {
     return "Minimum price is $0.001";
   }
 
-  if (!body.endpoint!.startsWith("https://")) {
-    return "Endpoint must use HTTPS";
+  if (!isSafeAgentUrl(body.endpoint!)) {
+    return "Endpoint must be an https:// URL on a public host";
+  }
+
+  // Service endpoints are forwarded to by /generate just like the top-level
+  // endpoint (via sub_path), and they can arrive straight out of a third-party
+  // OpenAPI spec via /probe-openapi, so they get the same check.
+  if (body.services) {
+    if (!Array.isArray(body.services)) {
+      return "services must be an array";
+    }
+    for (const service of body.services) {
+      if (!service?.endpoint || !isSafeAgentUrl(service.endpoint)) {
+        return `Service "${service?.name ?? "?"}" endpoint must be an https:// URL on a public host`;
+      }
+    }
   }
 
   return null;

@@ -1,4 +1,5 @@
 import type { Env } from "../lib/registry";
+import { assertSafeAgentUrl, UnsafeUrlError, probeFetch } from "../lib/safe-url";
 
 /**
  * GET /probe-openapi?url=<api-root-or-openapi-json>
@@ -89,7 +90,7 @@ async function resolveOpenApiUrl(input: string): Promise<{ specUrl: string; base
   ];
   for (const c of candidates) {
     try {
-      const res = await fetch(c, { headers: { Accept: "application/json" } });
+      const res = await probeFetch(c, { headers: { Accept: "application/json" } });
       if (res.ok) return { specUrl: c, baseUrl: cleaned };
     } catch {
       // try next
@@ -107,7 +108,7 @@ async function probePayTo(
     const url = `${baseUrl}${p.startsWith("/") ? p : "/" + p}`;
     for (const method of ["GET", "POST"] as const) {
       try {
-        const res = await fetch(url, {
+        const res = await probeFetch(url, {
           method,
           headers: { "Content-Type": "application/json", Accept: "application/json" },
           ...(method === "POST" ? { body: "{}" } : {}),
@@ -150,11 +151,20 @@ export async function handleProbeOpenApi(request: Request, _env: Env): Promise<R
   const url = new URL(request.url);
   const apiUrl = url.searchParams.get("url");
 
-  if (!apiUrl || !apiUrl.startsWith("https://")) {
+  if (!apiUrl) {
     return new Response(JSON.stringify({ error: "url param required (must be https://)" }), {
       status: 400,
       headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
     });
+  }
+
+  try {
+    assertSafeAgentUrl(apiUrl, "url param");
+  } catch (e) {
+    return new Response(
+      JSON.stringify({ error: e instanceof UnsafeUrlError ? e.message : "Invalid url param" }),
+      { status: 400, headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } }
+    );
   }
 
   const resolved = await resolveOpenApiUrl(apiUrl);
@@ -167,7 +177,7 @@ export async function handleProbeOpenApi(request: Request, _env: Env): Promise<R
 
   let spec: OpenApiSpec;
   try {
-    const res = await fetch(resolved.specUrl, { headers: { Accept: "application/json" } });
+    const res = await probeFetch(resolved.specUrl, { headers: { Accept: "application/json" } });
     if (!res.ok) {
       return new Response(
         JSON.stringify({ error: `OpenAPI fetch returned ${res.status}` }),
@@ -183,7 +193,24 @@ export async function handleProbeOpenApi(request: Request, _env: Env): Promise<R
   }
 
   // Derive base URL: prefer servers[0].url, else the URL the user provided.
-  const baseUrl = spec.servers?.[0]?.url?.replace(/\/$/, "") ?? resolved.baseUrl;
+  //
+  // servers[0].url is attacker-controlled — it arrives inside a third-party
+  // document. We fetch it below, and it ends up stored in the manifest that
+  // /generate forwards paid requests to, so it gets the same guard as the
+  // builder's own input rather than being trusted for having come from a spec.
+  const declaredBase = spec.servers?.[0]?.url?.replace(/\/$/, "");
+  let baseUrl = resolved.baseUrl;
+  if (declaredBase) {
+    try {
+      assertSafeAgentUrl(declaredBase, "servers[0].url in your spec");
+      baseUrl = declaredBase;
+    } catch (e) {
+      return new Response(
+        JSON.stringify({ error: e instanceof UnsafeUrlError ? e.message : "Invalid servers[0].url" }),
+        { status: 422, headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } }
+      );
+    }
+  }
 
   // Enumerate payable operations.
   const services: Array<{ name: string; endpoint: string; priceUsd: number }> = [];

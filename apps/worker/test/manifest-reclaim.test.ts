@@ -127,7 +127,41 @@ describe("manifest validation runs before any 402", () => {
       makeEnv()
     );
     expect(res.status).toBe(400);
-    expect((await res.json() as { error: string }).error).toContain("HTTPS");
+    expect((await res.json() as { error: string }).error).toContain("https");
+  });
+
+  it("rejects an endpoint on a private host", async () => {
+    const res = await handleManifest(
+      permanentRequest(makeManifest({ endpoint: "https://192.168.1.1/generate" })),
+      makeEnv()
+    );
+    expect(res.status).toBe(400);
+  });
+
+  // Service endpoints reach the same forwarding path as the top-level endpoint
+  // via /generate's sub_path, and can come straight out of a third-party spec.
+  it("rejects a service endpoint on an internal address", async () => {
+    const res = await handleManifest(
+      permanentRequest(makeManifest({
+        services: [
+          { name: "render", endpoint: "https://agent.example/render" },
+          { name: "sneaky", endpoint: "http://169.254.169.254/latest/meta-data" },
+        ],
+      } as never)),
+      makeEnv()
+    );
+    expect(res.status).toBe(400);
+    expect((await res.json() as { error: string }).error).toContain("sneaky");
+  });
+
+  it("accepts services that are all public https", async () => {
+    const res = await handleManifest(
+      permanentRequest(makeManifest({
+        services: [{ name: "render", endpoint: "https://agent.example/render" }],
+      } as never)),
+      makeEnv()
+    );
+    expect(res.status).toBe(402);
   });
 
   it("rejects a price below the $0.001 floor", async () => {

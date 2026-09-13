@@ -25,7 +25,7 @@ function probe(url: string) {
 
 /** Route fetches by URL; anything unrouted 404s, so a test can't pass by accident. */
 function mockFetch(routes: Record<string, { status?: number; body?: unknown; headers?: Record<string, string> }>) {
-  const fn = vi.fn(async (input: RequestInfo | URL) => {
+  const fn = vi.fn(async (input: RequestInfo | URL, _init?: RequestInit) => {
     const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
     const hit = routes[url];
     if (!hit) return new Response("not found", { status: 404 });
@@ -193,6 +193,54 @@ describe("GET /probe-openapi — falling back to a live 402", () => {
     const body = await (await probe("https://agent.example")).json() as ProbeResult;
     expect(body.payTo).toBe(PAY_TO);
     expect(body.chainId).toBe(8453);
+  });
+});
+
+describe("GET /probe-openapi — a hostile spec cannot redirect our fetches", () => {
+  // servers[0].url arrives inside a third-party document. Before this guard it
+  // was used verbatim: probePayTo() fetched it, and it was stored as the agent
+  // endpoint that /generate later forwards paid requests to.
+  it.each([
+    ["cloud metadata", "http://169.254.169.254/latest/meta-data"],
+    ["private network", "https://192.168.1.1/admin"],
+    ["loopback", "https://127.0.0.1:8787/internal"],
+    ["plaintext http", "http://agent.example"],
+  ])("refuses a spec whose servers[0].url points at %s", async (_label, evil) => {
+    const fetchFn = mockFetch({
+      "https://agent.example/openapi.json": {
+        body: { ...SPEC_WITH_X402, servers: [{ url: evil }] },
+      },
+    });
+
+    const res = await probe("https://agent.example");
+    expect(res.status).toBe(422);
+
+    // and crucially, we never actually reached it
+    const called = fetchFn.mock.calls.map((c) => String(c[0]));
+    expect(called.some((u) => u.startsWith(evil))).toBe(false);
+  });
+
+  it("refuses a url param pointing at a private host", async () => {
+    const fetchFn = mockFetch({});
+    const res = await probe("https://169.254.169.254/openapi.json");
+
+    expect(res.status).toBe(400);
+    expect(fetchFn).not.toHaveBeenCalled();
+  });
+});
+
+describe("GET /probe-openapi — outbound calls are bounded", () => {
+  it("gives every probe a timeout and refuses to follow redirects", async () => {
+    const fetchFn = mockFetch({ "https://agent.example/openapi.json": { body: SPEC_WITH_X402 } });
+
+    await probe("https://agent.example");
+
+    expect(fetchFn).toHaveBeenCalled();
+    for (const call of fetchFn.mock.calls) {
+      const init = call[1] as RequestInit | undefined;
+      expect(init?.signal).toBeInstanceOf(AbortSignal);
+      expect(init?.redirect).toBe("manual");
+    }
   });
 });
 
