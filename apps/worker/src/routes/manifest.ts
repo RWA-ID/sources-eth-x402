@@ -1,7 +1,7 @@
 import type { AgentManifest, Registration } from "@sources-eth/agent-manifest";
 import type { Env } from "../lib/registry";
 import { storeAgent } from "../lib/registry";
-import { pinJSON, fetchFromIPFS } from "../lib/ipfs";
+import { pinJSON, fetchFromIPFS, PinataError } from "../lib/ipfs";
 import { verifyPayment, markPaymentUsed, buildRegistration402Response } from "../lib/payment";
 import { lookupAgentBook } from "../lib/agentbook";
 import { isSafeAgentUrl } from "../lib/safe-url";
@@ -74,11 +74,20 @@ export async function handleManifest(request: Request, env: Env): Promise<Respon
     let cid: string;
     try {
       cid = await pinJSON(manifestToPin, `agent-${body.name}`, env.PINATA_JWT);
-    } catch {
-      return new Response(JSON.stringify({ error: "IPFS pinning failed" }), {
-        status: 500,
-        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
-      });
+    } catch (e) {
+      // The payment already settled on-chain at this point and has NOT been
+      // marked used, so the same X-PAYMENT proof can be retried once pinning
+      // is healthy. Say so, and say why it failed.
+      const reason = e instanceof PinataError ? e.reason : "unknown";
+      console.error("pinJSON failed (paid registration)", reason);
+      return new Response(
+        JSON.stringify({
+          error: `IPFS pinning failed: ${reason}`,
+          retryable: true,
+          detail: "Your payment was not consumed. Retry with the same X-PAYMENT header once this is resolved.",
+        }),
+        { status: 500, headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } }
+      );
     }
 
     manifestToPin.ipfs_cid = cid;
@@ -142,8 +151,10 @@ export async function handleManifest(request: Request, env: Env): Promise<Respon
   let cid: string;
   try {
     cid = await pinJSON(manifestToPin, `agent-${body.name}`, env.PINATA_JWT);
-  } catch {
-    return new Response(JSON.stringify({ error: "IPFS pinning failed" }), {
+  } catch (e) {
+    const reason = e instanceof PinataError ? e.reason : "unknown";
+    console.error("pinJSON failed (free trial registration)", reason);
+    return new Response(JSON.stringify({ error: `IPFS pinning failed: ${reason}` }), {
       status: 500,
       headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
     });
