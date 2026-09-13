@@ -318,46 +318,88 @@ This is where the magic happens for the user. Requirements:
 
 ### Revenue Streams
 
+> **This section is the source of truth for pricing and must match the code.**
+> Verified against `apps/worker/src/routes/manifest.ts`, `developer.ts` and
+> `wrangler.toml` on 2026-09-13. If you change a fee, change it in all three
+> places and here in the same commit — a stale number here has already shipped
+> wrong pricing to the site once.
+
 | Stream | Model | Amount | Timeline |
 |---|---|---|---|
-| Trial registration | One-time trial fee | $10 USDC | MVP |
-| Full registration | One-time permanent fee | $49 USDC ($10 credited) | MVP |
+| Trial registration | Free, time-limited | **$0** | MVP |
+| Upgrade after trial | One-time, makes listing permanent | $39 USDC | MVP |
+| Direct permanent registration | One-time, skips the trial | $49 USDC | MVP |
+| Developer API key | One-time, never expires | $99 USDC | MVP |
 | Featured listings | Recurring sponsorship | TBD | Phase 2 |
 | Premium placement | Pay-per-impression | TBD | Phase 3 |
 
+⚠️ **Known pricing inconsistency — decide before scaling.** The trial is free, so
+trial → upgrade totals **$39**, while registering permanently up front costs
+**$49**. The original design was $10 trial + $39 upgrade = $49 either way; that
+arithmetic broke when the trial went free and nobody re-derived it. A builder
+currently saves $10 by taking the free trial first. Either raise the upgrade to
+$49 or lower direct registration to $39.
+
 ### Trial → Full Registration Flow
 
-Builders enter via a **$10 USDC trial** that activates a 5-day window. During the trial their agent is fully live and searchable. After 5 days they pay an additional **$39 USDC** to make the listing permanent ($10 already credited toward the $49 total). If they don't upgrade, the agent is hidden from search — but the manifest stays on IPFS and the registration record is preserved so upgrading later reactivates instantly without re-pinning.
+Builders enter via a **free trial** that activates a **15-day** window
+(`TRIAL_DURATION_DAYS`). No payment, no card, no USDC is required to start —
+`POST /manifest` without a `plan` param is not 402-gated at all and records
+`fee_paid_total: 0`. During the trial the agent is fully live and searchable.
+After 15 days they pay **$39 USDC** to make the listing permanent. If they don't
+upgrade, the agent is hidden from search — but the manifest stays on IPFS and the
+registration record is preserved so upgrading later reactivates instantly without
+re-pinning.
 
 **Registration state machine:**
 
 ```
 UNREGISTERED
-    ↓ pays $10 via x402
-TRIAL_ACTIVE        → listed in search, full functionality, 5-day clock running
-    ↓ 5 days pass without upgrade
+    ↓ POST /manifest — free, no payment
+TRIAL_ACTIVE        → listed in search, full functionality, 15-day clock running
+    ↓ 15 days pass without upgrade
 TRIAL_EXPIRED       → hidden from search, upgrade prompt shown on agent page
     ↓ pays $39 via x402 (at any time, no deadline)
 ACTIVE              → permanently listed, no further fees ever
+
+UNREGISTERED
+    ↓ POST /manifest?plan=permanent — 402-gated, $49
+ACTIVE              → skips the trial entirely
 ```
+
+**Name reclaim rule:** once a trial expires, the name is claimable by a *different*
+owner, but the *original* owner cannot start a second free trial on it — they get
+an upgrade prompt instead. Without this, a builder could cycle free trials on the
+same name forever. Enforced in `checkNameAvailable()` in `manifest.ts`.
 
 **Implementation:**
 
 ```typescript
 // worker/src/routes/manifest.ts
 
-const TRIAL_FEE_USDC    = 10_000_000   // $10 — USDC has 6 decimals
-const UPGRADE_FEE_USDC  = 39_000_000   // $39 — remainder to reach $49 total
-const FULL_FEE_USDC     = 49_000_000   // $49 — if paying full without trial
-const TRIAL_DURATION_MS = 5 * 24 * 60 * 60 * 1000  // 5 days in ms
-const PLATFORM_TREASURY = "0xYOUR_TREASURY_ADDRESS"
+// Fees come from env (wrangler.toml [vars]), not from constants in this file.
+// USDC has 6 decimals, so these are raw integer amounts.
+env.UPGRADE_FEE_USDC      // "39000000" — $39, trial → permanent
+env.FULL_FEE_USDC         // "49000000" — $49, permanent without a trial
+env.TRIAL_DURATION_DAYS   // "15"
+env.PLATFORM_TREASURY_ADDRESS
 
-// POST /manifest — no X-PAYMENT header:
-// → return 402 with TRIAL_FEE_USDC payable to PLATFORM_TREASURY
+// env.TRIAL_FEE_USDC ("10000000") is DEAD CONFIG — it is declared in the Env
+// type and in wrangler.toml but read nowhere in src/. It is a leftover from the
+// old paid-trial design. Do not reintroduce it without wiring it up.
 
-// POST /manifest — X-PAYMENT header present, amount = TRIAL_FEE_USDC:
-// → verify payment → pin manifest → register with status: "trial"
-// → set trial_expires_at = now + TRIAL_DURATION_MS
+// POST /manifest — no plan param:
+// → FREE. No 402, no X-PAYMENT header required.
+// → pin manifest → register with status: "trial", fee_paid_total: 0
+// → set trial_expires_at = now + TRIAL_DURATION_DAYS
+
+// POST /manifest?plan=permanent — no X-PAYMENT header:
+// → validate body and check name availability FIRST, then return 402 with
+//   FULL_FEE_USDC payable to PLATFORM_TREASURY
+//   (validating first prevents charging for a name that is already taken)
+
+// POST /manifest?plan=permanent — X-PAYMENT header present:
+// → verify payment → pin manifest → register with status: "active"
 
 // POST /upgrade/:ens — no X-PAYMENT header:
 // → check agent exists and is in TRIAL_ACTIVE or TRIAL_EXPIRED state
@@ -371,12 +413,12 @@ const PLATFORM_TREASURY = "0xYOUR_TREASURY_ADDRESS"
 ```
 kv:registrations:{ens} → {
   ens: string
-  tx_hash_trial: string       // $10 payment tx
+  tx_hash_trial: string       // "free" on a free trial; the $49 tx on direct permanent
   tx_hash_upgrade?: string    // $39 payment tx (set on upgrade)
-  fee_paid_total: number      // 10 or 49
+  fee_paid_total: number      // raw USDC units: 0 (trial), 39000000, or 49000000
   status: "trial" | "trial_expired" | "active"
   trial_started_at: number    // unix ms
-  trial_expires_at: number    // unix ms (trial_started_at + 5 days)
+  trial_expires_at: number    // unix ms (trial_started_at + 15 days)
   upgraded_at?: number        // unix ms
 }
 
@@ -411,16 +453,38 @@ Since sources.eth has no accounts and collects no email, trial expiry is communi
 2. The registration success screen prominently shows the trial expiry date and the upgrade URL
 3. The upgrade path works at any time after expiry — no deadline, no data loss
 
-**What $10 trial gets the builder:**
-- 5 days fully live in search — real traffic, real payments, real validation
+**What the free trial gets the builder:**
+- 15 days fully live in search — real traffic, real payments, real validation
 - ENS subdomain: `{name}.agents.sources.eth`
 - IPFS manifest pinning (permanent regardless of upgrade)
 - Full x402 proxy infrastructure access
+- No payment, no card, no USDC required to start
 
-**What $49 permanent gets the builder:**
+**What $49 permanent (or $39 upgrade) gets the builder:**
 - Everything above, permanently
 - No recurring fees, ever
 - Priority consideration for featured placement (Phase 2)
+
+### Developer API Key — $99, one-time
+
+Separate product from agent listings, with its own flow at `/developer` and its
+own 402-gated route `POST /developer/register`. It sells an API key that proxies
+any AI endpoint; no listing is created and no manifest is pinned.
+
+**The key never expires.** The stored `ApiKey` record is
+`{ key, label, payment_address, tx_hash, created_at, requests_total, active }` —
+there is no expiry field and nothing ever lapses it. The worker's own 402
+description says "$99 one-time" and that is correct.
+
+⚠️ **`apps/web/app/developer/page.tsx` contradicts this** — it advertises
+"$99 USDC / year", "Pay $99/year", and "Cancel anytime". It promises a recurring
+charge that is never taken and an expiry that never happens. Fix the page copy to
+one-time, or add real annual expiry to the `ApiKey` record. Do not leave it split.
+
+The listing flow must never offer this plan. `RegisterForm` once rendered a
+"$99/yr Developer API" panel that silently submitted as a free trial; it was
+removed on 2026-09-13 and `Plan` is now `"trial" | "permanent"` so the type
+system prevents it coming back.
 
 **What sources.eth never takes:**
 - No cut of per-transaction revenue — 100% of generation payments go to the agent's address
@@ -442,11 +506,14 @@ Sponsored results must be visually labeled. Never disguise paid placement as org
 
 ```
 PLATFORM_TREASURY_ADDRESS=      # Base mainnet address — receives all registration fees
-TRIAL_FEE_USDC=10000000         # $10 in USDC (6 decimals)
-UPGRADE_FEE_USDC=39000000       # $39 in USDC (6 decimals)
-FULL_FEE_USDC=49000000          # $49 in USDC — for direct full registration
-TRIAL_DURATION_DAYS=5           # Configurable without redeploy
+UPGRADE_FEE_USDC=39000000       # $39 in USDC (6 decimals) — trial → permanent
+FULL_FEE_USDC=49000000          # $49 in USDC — direct permanent registration
+TRIAL_DURATION_DAYS=15          # Configurable without redeploy
+TRIAL_FEE_USDC=10000000         # DEAD — declared but read nowhere. Trial is free.
 ```
+
+The $99 Developer API key fee is **not** an env var — it is hardcoded as
+`API_KEY_FEE = "99000000"` in `apps/worker/src/routes/developer.ts`.
 
 ---
 
@@ -572,11 +639,15 @@ PINATA_JWT=                      # Pinata API JWT for IPFS pinning
 BASE_RPC_URL=                    # Base mainnet RPC (Alchemy or Infura)
 X402_FACILITATOR_URL=            # Coinbase x402 facilitator endpoint
 PLATFORM_TREASURY_ADDRESS=       # Base mainnet address — receives all registration fees
-TRIAL_FEE_USDC=10000000          # $10 in USDC (6 decimals)
-UPGRADE_FEE_USDC=39000000        # $39 in USDC — remainder to reach $49 total
-FULL_FEE_USDC=49000000           # $49 in USDC — direct full registration path
-TRIAL_DURATION_DAYS=5            # Configurable trial window without redeploy
+UPGRADE_FEE_USDC=39000000        # $39 in USDC — trial → permanent
+FULL_FEE_USDC=49000000           # $49 in USDC — direct permanent registration
+TRIAL_DURATION_DAYS=15           # Configurable trial window without redeploy
+TRIAL_FEE_USDC=10000000          # DEAD — declared but read nowhere. Trial is free.
 ```
+
+Note: these live in `[vars]` in `wrangler.toml`, not in secrets. Only `PINATA_JWT`,
+`BASE_RPC_URL`, `ETH_RPC_URL` and `X402_FACILITATOR_URL` are `wrangler secret put`.
+Never add a name to `[vars]` that also exists as a secret — `[vars]` shadows it.
 
 ### Web (`.env.local`)
 ```
@@ -668,7 +739,8 @@ Build in this exact sequence. Each step is independently deployable and testable
 
 ### Step 5 — Agent registration + trial flow
 - [ ] `RegisterForm` multi-step component
-- [ ] `POST /manifest` — 402-gated with TRIAL_FEE_USDC ($10)
+- [ ] `POST /manifest` — free trial, not payment-gated
+- [ ] `POST /manifest?plan=permanent` — 402-gated with FULL_FEE_USDC ($49)
 - [ ] `POST /upgrade/:ens` — 402-gated with UPGRADE_FEE_USDC ($39)
 - [ ] Registration KV lifecycle: trial → trial_expired → active
 - [ ] Trial expiry check on every `GET /search` and `GET /agent/:ens`
