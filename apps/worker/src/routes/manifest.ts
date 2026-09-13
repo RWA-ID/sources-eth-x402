@@ -4,6 +4,7 @@ import { storeAgent } from "../lib/registry";
 import { pinJSON, fetchFromIPFS } from "../lib/ipfs";
 import { verifyPayment, markPaymentUsed, buildRegistration402Response } from "../lib/payment";
 import { lookupAgentBook } from "../lib/agentbook";
+import { incrementStat } from "./stats";
 
 export async function handleManifest(request: Request, env: Env): Promise<Response> {
   const url = new URL(request.url);
@@ -93,6 +94,7 @@ export async function handleManifest(request: Request, env: Env): Promise<Respon
 
     await storeAgent(manifestToPin, reg, env.AGENTS_KV);
     await markPaymentUsed(txHash, manifestToPin.ens, env.AGENTS_KV);
+    await incrementStat(env.AGENTS_KV, "stats:permanent_agents");
 
     return new Response(
       JSON.stringify({ success: true, cid, ens: manifestToPin.ens, trial_expires_at: null, status: "active" }),
@@ -305,6 +307,7 @@ export async function handleUpgrade(ens: string, request: Request, env: Env): Pr
 
   await env.AGENTS_KV.put(`registrations:${ens}`, JSON.stringify(updated));
   await markPaymentUsed(txHash, ens, env.AGENTS_KV);
+  await incrementStat(env.AGENTS_KV, "stats:permanent_agents");
 
   return new Response(
     JSON.stringify({ success: true, ens, status: "active" }),
@@ -325,15 +328,28 @@ async function checkNameAvailable(
   const reg = await kv.get<Registration>(`registrations:${ens}`, "json");
   if (!reg) return { available: true };
 
-  // Expired trials are reclaimable by anyone
-  if (reg.status === "trial_expired") return { available: true };
-  if (reg.status === "trial" && Date.now() > reg.trial_expires_at) return { available: true };
+  const isExpired =
+    reg.status === "trial_expired" ||
+    (reg.status === "trial" && Date.now() > reg.trial_expires_at);
 
-  // Name is live (active or in-trial) — only the existing owner can update it
   const existing = await kv.get<AgentManifest>(`agents:${ens}`, "json");
-  if (existing && existing.payment_address.toLowerCase() === newPaymentAddress.toLowerCase()) {
-    return { available: true }; // same owner — allow update
+  const isSameOwner =
+    existing?.payment_address.toLowerCase() === newPaymentAddress.toLowerCase();
+
+  if (isExpired) {
+    if (isSameOwner) {
+      // Original owner cannot grab a second free trial — must upgrade
+      return {
+        available: false,
+        reason: `Your free trial for ${ens} has expired. Pay $49 to go permanent at sources.eth.limo/agent?ens=${ens}`,
+      };
+    }
+    // Different owner — expired name is up for grabs
+    return { available: true };
   }
+
+  // Name is live (active or in-trial) — only the same owner can update it
+  if (isSameOwner) return { available: true };
 
   const statusLabel = reg.status === "active" ? "permanently listed" : "in an active trial";
   return {

@@ -1,6 +1,7 @@
 import type { Env } from "../lib/registry";
 import { getAgent } from "../lib/registry";
 import { build402Response, verifyPayment, markPaymentUsed } from "../lib/payment";
+import { incrementStat } from "./stats";
 
 export async function handleGenerate(request: Request, env: Env): Promise<Response> {
   const body = await request.json() as { ens: string; prompt?: string; sub_path?: string; [key: string]: unknown };
@@ -87,8 +88,12 @@ export async function handleGenerate(request: Request, env: Env): Promise<Respon
     });
   }
 
-  // Step 3: Mark payment as used (replay protection)
+  // Step 3: Mark payment as used (replay protection) and update platform stats
   await markPaymentUsed(txHash, ens, env.AGENTS_KV);
+  await Promise.all([
+    incrementStat(env.AGENTS_KV, "stats:total_transactions"),
+    incrementStat(env.AGENTS_KV, "stats:total_usdc_volume", parseInt(amountRaw, 10)),
+  ]);
 
   // Step 4: Forward to agent endpoint (with optional sub_path for multi-service agents)
   const base = agent.endpoint.replace(/\/$/, "");

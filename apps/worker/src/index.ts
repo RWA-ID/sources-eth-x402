@@ -14,6 +14,8 @@ import { handleRefreshPricing } from "./routes/refresh-pricing";
 import { handleWorldVerify } from "./routes/world-verify";
 import { handleStats } from "./routes/stats";
 import { handleX402 } from "./routes/x402";
+import { handleOpenApi } from "./routes/openapi";
+import { handleProbeOpenApi } from "./routes/probe-openapi";
 
 function cors(response: Response): Response {
   const headers = new Headers(response.headers);
@@ -105,6 +107,11 @@ export default {
       return cors(await handleProbe(request, env));
     }
 
+    // GET /probe-openapi — discover paid agent via OpenAPI spec
+    if (method === "GET" && path === "/probe-openapi") {
+      return cors(await handleProbeOpenApi(request, env));
+    }
+
     // GET /discover — ERC-8004 registry discovery
     if (method === "GET" && path === "/discover") {
       return cors(await handleDiscover(request, env));
@@ -144,6 +151,24 @@ export default {
     const ogMatch = path.match(/^\/og\/agent\/(.+)$/);
     if (method === "GET" && ogMatch) {
       return await handleOgAgent(ogMatch[1], env);
+    }
+
+    // GET /favicon.ico — required for x402scan listing icon
+    if (method === "GET" && (path === "/favicon.ico" || path === "/favicon.svg")) {
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#0a0a0f"/><text x="50%" y="56%" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="32" font-weight="700" fill="#7c6aff">s</text></svg>`;
+      return new Response(svg, {
+        status: 200,
+        headers: {
+          "Content-Type": "image/svg+xml",
+          "Cache-Control": "public, max-age=86400",
+          "Access-Control-Allow-Origin": "*",
+        },
+      });
+    }
+
+    // GET /openapi.json — agentcash / x402scan discovery spec
+    if (method === "GET" && path === "/openapi.json") {
+      return cors(await handleOpenApi(request, env));
     }
 
     // GET /.well-known/x402.json — machine-readable registration manifest
