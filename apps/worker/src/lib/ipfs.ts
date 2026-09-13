@@ -41,11 +41,39 @@ export async function pinJSON(
   return result.IpfsHash;
 }
 
+/**
+ * Read order matters. gateway.pinata.cloud refuses content by policy and is
+ * the slowest of the three, so it goes last; our dedicated gateway answers in
+ * about a second where ipfs.io routinely takes twenty-five.
+ */
+export const IPFS_GATEWAYS = [
+  "https://ipfs.onchain-id.id/ipfs/",
+  "https://ipfs.io/ipfs/",
+  "https://gateway.pinata.cloud/ipfs/",
+] as const;
+
+/** The gateway to hand back to clients in an ipfs_url field. */
+export const PUBLIC_IPFS_GATEWAY = IPFS_GATEWAYS[0];
+
 export async function fetchFromIPFS(cid: string): Promise<unknown> {
-  const url = `https://gateway.pinata.cloud/ipfs/${cid}`;
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`IPFS fetch failed for CID ${cid}: ${response.status}`);
+  const failures: string[] = [];
+
+  for (const gateway of IPFS_GATEWAYS) {
+    try {
+      const response = await fetch(`${gateway}${cid}`, {
+        headers: { Accept: "application/json" },
+        // A fresh pin can take a while to become servable; never hang forever.
+        signal: AbortSignal.timeout(12_000),
+      });
+      if (!response.ok) {
+        failures.push(`${gateway} -> ${response.status}`);
+        continue;
+      }
+      return await response.json();
+    } catch (e) {
+      failures.push(`${gateway} -> ${e instanceof Error ? e.name : "error"}`);
+    }
   }
-  return response.json();
+
+  throw new Error(`IPFS fetch failed for CID ${cid}: ${failures.join(", ")}`);
 }

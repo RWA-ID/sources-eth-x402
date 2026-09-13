@@ -1,7 +1,7 @@
 import type { AgentManifest, Registration } from "@sources-eth/agent-manifest";
 import type { Env } from "../lib/registry";
 import { storeAgent } from "../lib/registry";
-import { pinJSON, fetchFromIPFS, PinataError } from "../lib/ipfs";
+import { pinJSON, fetchFromIPFS, PinataError, PUBLIC_IPFS_GATEWAY } from "../lib/ipfs";
 import { verifyPayment, markPaymentUsed, buildRegistration402Response } from "../lib/payment";
 import { lookupAgentBook } from "../lib/agentbook";
 import { isSafeAgentUrl } from "../lib/safe-url";
@@ -178,7 +178,7 @@ export async function handleManifest(request: Request, env: Env): Promise<Respon
       success: true,
       cid,
       ens: manifestToPin.ens,
-      ipfs_url: `https://gateway.pinata.cloud/ipfs/${cid}`,
+      ipfs_url: `${PUBLIC_IPFS_GATEWAY}${cid}`,
       trial_expires_at: trialExpiresAt,
       status: "trial",
     }),
