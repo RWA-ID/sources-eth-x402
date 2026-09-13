@@ -178,6 +178,34 @@ describe("manifest validation runs before any 402", () => {
     expect((await res.json() as { error: string }).error).toContain("sneaky");
   });
 
+  // Regression: the SSRF guard assumed service endpoints were absolute URLs.
+  // They are relative sub-paths, so every multi-service registration failed
+  // with: Service "upload" endpoint must be an https:// URL on a public host.
+  it("accepts relative sub-path service endpoints", async () => {
+    const res = await handleManifest(
+      permanentRequest(withSig(makeManifest({
+        services: [
+          { name: "upload", endpoint: "upload" },
+          { name: "pin-json", endpoint: "pin/json" },
+          { name: "root", endpoint: "" },
+        ],
+      }) as never)),
+      makeEnv()
+    );
+    expect(res.status).toBe(402);
+  });
+
+  it("still rejects a sub-path that tries to climb out of the base", async () => {
+    const res = await handleManifest(
+      permanentRequest(withSig(makeManifest({
+        services: [{ name: "sneaky", endpoint: "../../admin" }],
+      }) as never)),
+      makeEnv()
+    );
+    expect(res.status).toBe(400);
+    expect((await res.json() as { error: string }).error).toContain("sneaky");
+  });
+
   it("accepts services that are all public https", async () => {
     const res = await handleManifest(
       permanentRequest(withSig(makeManifest({

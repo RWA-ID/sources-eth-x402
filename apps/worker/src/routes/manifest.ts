@@ -389,6 +389,28 @@ async function checkNameAvailable(
   };
 }
 
+
+/** "" means the base endpoint itself, which is already validated. */
+function validateServiceEndpoint(endpoint: string, name?: string): string | null {
+  const label = `Service "${name ?? "?"}"`;
+
+  if (endpoint === "") return null;
+
+  const isAbsolute = /^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(endpoint) || endpoint.startsWith("//");
+  if (isAbsolute) {
+    return isSafeAgentUrl(endpoint)
+      ? null
+      : `${label} endpoint must be an https:// URL on a public host`;
+  }
+
+  if (endpoint.length > 200) return `${label} endpoint is too long`;
+  if (endpoint.includes("..")) return `${label} endpoint must not contain ".."`;
+  if (!/^[A-Za-z0-9._~\-/]+$/.test(endpoint)) {
+    return `${label} endpoint must be a plain sub-path (letters, digits, . _ ~ - /)`;
+  }
+  return null;
+}
+
 function validateManifest(body: Partial<AgentManifest>): string | null {
   const required = [
     "name", "display_name", "description", "ens", "version",
@@ -414,17 +436,23 @@ function validateManifest(body: Partial<AgentManifest>): string | null {
     return "Endpoint must be an https:// URL on a public host";
   }
 
-  // Service endpoints are forwarded to by /generate just like the top-level
-  // endpoint (via sub_path), and they can arrive straight out of a third-party
-  // OpenAPI spec via /probe-openapi, so they get the same check.
-  if (body.services) {
+  // A service endpoint is normally a RELATIVE sub-path ("upload"), which
+  // /generate appends to the already-validated base by string concatenation:
+  //   `${base}/${sub_path}`
+  // That cannot change the host — "https://a.example/" + "https://evil.example"
+  // is just a path on a.example — so a relative sub-path needs no host check,
+  // only to be a sane path. An ABSOLUTE endpoint is a different matter and gets
+  // the full public-https check.
+  if (body.services !== undefined) {
     if (!Array.isArray(body.services)) {
       return "services must be an array";
     }
     for (const service of body.services) {
-      if (!service?.endpoint || !isSafeAgentUrl(service.endpoint)) {
-        return `Service "${service?.name ?? "?"}" endpoint must be an https:// URL on a public host`;
+      if (!service || typeof service.endpoint !== "string") {
+        return `Service "${service?.name ?? "?"}" is missing an endpoint`;
       }
+      const err = validateServiceEndpoint(service.endpoint, service.name);
+      if (err) return err;
     }
   }
 

@@ -6,7 +6,8 @@ import type { AgentManifest, AgentCategory, AgentService } from "@sources-eth/ag
 import { registerManifest, probeAgent, probeAgentOpenApi, importErc8004Agent } from "../lib/api";
 import { buildRegistrationMessage } from "@sources-eth/agent-manifest";
 import { useAppKit, useAppKitAccount } from "@reown/appkit/react";
-import { useSignMessage } from "wagmi";
+import { useSignMessage, useChainId, useSwitchChain } from "wagmi";
+import { base } from "@reown/appkit/networks";
 import { HumanVerifyWidget } from "./HumanVerifyWidget";
 import type { ProbeResult, ImportedAgent } from "../lib/api";
 import { AgentShareCard } from "./AgentShareCard";
@@ -140,6 +141,8 @@ export function RegisterForm({ plan = "trial" }: { plan?: Plan }) {
   const { open } = useAppKit();
   const { address, isConnected } = useAppKitAccount();
   const { signMessageAsync } = useSignMessage();
+  const chainId = useChainId();
+  const { switchChainAsync } = useSwitchChain();
 
   const doProbe = async (
     name: string,
@@ -311,12 +314,37 @@ export function RegisterForm({ plan = "trial" }: { plan?: Plan }) {
         issued_at,
       });
 
+      // The app only declares Base. A wallet on another chain makes AppKit
+      // refuse before any signing prompt appears, which reads to the user as
+      // "signature rejected" when they were never actually asked.
+      if (chainId !== base.id) {
+        try {
+          setSigning(true);
+          await switchChainAsync({ chainId: base.id });
+        } catch {
+          setSubmitError(
+            `Your wallet is on chain ${chainId ?? "unknown"}. Switch it to Base (8453) to sign this listing.`
+          );
+          return;
+        } finally {
+          setSigning(false);
+        }
+      }
+
       let signature: string;
       try {
         setSigning(true);
         signature = await signMessageAsync({ message });
-      } catch {
-        setSubmitError("Signature rejected — a listing must be authorized by its payout wallet.");
+      } catch (e) {
+        // Report what actually failed. Swallowing this turned a wrong-chain
+        // error and a genuine user rejection into the same useless sentence.
+        const raw = e instanceof Error ? e.message : String(e);
+        const rejected = /user rejected|denied|4001/i.test(raw);
+        setSubmitError(
+          rejected
+            ? "Signature rejected in your wallet — a listing must be authorized by its payout wallet."
+            : `Could not sign: ${raw.split("\n")[0].slice(0, 200)}`
+        );
         return;
       } finally {
         setSigning(false);
