@@ -5,6 +5,16 @@ const json = (data: unknown) =>
     headers: { "Content-Type": "application/json" },
   });
 
+/**
+ * A counter is a string in KV, so a missing or damaged value must not become
+ * NaN — incrementStat would then persist the string "NaN" and the counter
+ * would be permanently poisoned, rendering "NaN" on the landing page.
+ */
+function counter(value: string | null): number {
+  const n = parseInt(value ?? "0", 10);
+  return Number.isFinite(n) ? n : 0;
+}
+
 export async function handleStats(env: Env): Promise<Response> {
   const kv = env.AGENTS_KV;
 
@@ -15,9 +25,9 @@ export async function handleStats(env: Env): Promise<Response> {
   ]);
 
   return json({
-    permanent_agents: parseInt(permanentAgents ?? "0", 10),
-    total_transactions: parseInt(totalTransactions ?? "0", 10),
-    total_usdc_volume: parseInt(totalUsdcVolume ?? "0", 10),
+    permanent_agents: counter(permanentAgents),
+    total_transactions: counter(totalTransactions),
+    total_usdc_volume: counter(totalUsdcVolume),
   });
 }
 
@@ -27,5 +37,5 @@ export async function incrementStat(
   amount = 1
 ): Promise<void> {
   const current = await kv.get(key);
-  await kv.put(key, (parseInt(current ?? "0", 10) + amount).toString());
+  await kv.put(key, (counter(current) + amount).toString());
 }

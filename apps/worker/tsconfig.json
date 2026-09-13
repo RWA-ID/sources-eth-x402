@@ -4,7 +4,7 @@
     "module": "ES2022",
     "moduleResolution": "bundler",
     "lib": ["ES2022"],
-    "types": ["@cloudflare/workers-types"],
+    "types": ["@cloudflare/workers-types", "vitest/globals"],
     "strict": true,
     "noEmit": true,
     "skipLibCheck": true,
@@ -12,5 +12,5 @@
       "@sources-eth/agent-manifest": ["../../packages/agent-manifest/src/index.ts"]
     }
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts", "test/**/*.ts"]
 }
