@@ -84,8 +84,8 @@ export function HumanVerifyWidget({ compact = false, paymentAddress }: Props) {
           onClick={() => open({ view: "Connect" })}
           className={
             compact
-              ? "flex items-center gap-1.5 px-3 py-1.5 bg-[#7c6aff]/15 hover:bg-[#7c6aff]/25 border border-[#7c6aff]/40 rounded-lg text-xs text-[#a598ff] hover:text-white transition-all font-medium"
-              : "flex items-center gap-2 px-4 py-2.5 bg-[#7c6aff]/15 hover:bg-[#7c6aff]/25 border border-[#7c6aff]/40 hover:border-[#7c6aff]/60 rounded-xl text-sm text-[#a598ff] hover:text-white transition-all font-medium"
+              ? "flex items-center gap-1.5 px-3 py-1.5 bg-[#f97316]/15 hover:bg-[#f97316]/25 border border-[#f97316]/40 rounded-lg text-xs text-[#fdba74] hover:text-white transition-all font-medium"
+              : "flex items-center gap-2 px-4 py-2.5 bg-[#f97316]/15 hover:bg-[#f97316]/25 border border-[#f97316]/40 hover:border-[#f97316]/60 rounded-xl text-sm text-[#fdba74] hover:text-white transition-all font-medium"
           }
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -98,7 +98,7 @@ export function HumanVerifyWidget({ compact = false, paymentAddress }: Props) {
         </button>
       ) : status === "checking" ? (
         <div className="flex items-center gap-2 text-xs text-white/40">
-          <span className="inline-block w-3 h-3 border-2 border-white/20 border-t-[#7c6aff] rounded-full animate-spin" />
+          <span className="inline-block w-3 h-3 border-2 border-white/20 border-t-[#f97316] rounded-full animate-spin" />
           Checking AgentBook for{" "}
           <span className="font-mono text-white/60">{address?.slice(0, 6)}…{address?.slice(-4)}</span>
         </div>
@@ -128,7 +128,7 @@ export function HumanVerifyWidget({ compact = false, paymentAddress }: Props) {
               <span className="text-xs text-white/25">— not in AgentBook</span>
             </div>
             <p className="text-xs text-white/35 mb-1.5">Register to get verified:</p>
-            <code className="block text-xs text-[#4fd8b8] bg-black/30 rounded px-2 py-1.5 font-mono break-all">
+            <code className="block text-xs text-[#fdba74] bg-black/30 rounded px-2 py-1.5 font-mono break-all">
               npx @worldcoin/agentkit-cli register {address}
             </code>
           </div>
@@ -153,7 +153,7 @@ export function HumanVerifyWidget({ compact = false, paymentAddress }: Props) {
 
   return (
     <div className="max-w-3xl mx-auto mb-12">
-      <div className="bg-[#16161f] border border-white/[0.07] rounded-2xl p-6">
+      <div className="bg-[#17130f] border border-white/[0.07] rounded-2xl p-6">
         <div className="flex items-start gap-4">
           <div className="flex-shrink-0">
             <Image src="/human-verified.png" alt="Human Verified" width={48} height={48} unoptimized />

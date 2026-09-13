@@ -93,12 +93,12 @@ function LiveTickerEyebrow({ agents }: { agents: AgentManifest[] }) {
       <span className="text-white/55">x402 marketplace</span>
       <span className="text-white/20">·</span>
       <span className="inline-flex items-center gap-2">
-        <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#4fd8b8] animate-pulse" />
+        <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#fdba74] animate-pulse" />
         {current ? (
           <>
-            <span className="text-[#4fd8b8]">${current.price_usd.toFixed(2)}</span>
+            <span className="text-[#fdba74]">${current.price_usd.toFixed(2)}</span>
             <span className="text-white/20">·</span>
-            <span className="text-[#7c6aff]">{current.name}</span>
+            <span className="text-[#f97316]">{current.name}</span>
           </>
         ) : (
           <span className="text-white/55">live</span>
@@ -121,15 +121,15 @@ function FloatingReceipt({ agent }: { agent: AgentManifest | null }) {
         animation: "float-y 6s ease-in-out infinite",
       }}
     >
-      <div className="p-4 bg-[#16161f] border border-white/[0.07] rounded-xl font-mono text-[11px] text-white/55 shadow-[0_30px_60px_-20px_rgba(0,0,0,0.5)]">
+      <div className="p-4 bg-[#17130f] border border-white/[0.07] rounded-xl font-mono text-[11px] text-white/55 shadow-[0_30px_60px_-20px_rgba(0,0,0,0.5)]">
         <div className="flex justify-between text-white/35 text-[10px]">
           <span>receipt · base</span>
-          <span className="text-[#4fd8b8]">● paid</span>
+          <span className="text-[#fdba74]">● paid</span>
         </div>
         <div className="h-px bg-white/[0.07] my-2.5" />
         <div className="flex justify-between text-white/90">
           <span className="truncate pr-2">{agent.name}</span>
-          <span className="text-[#4fd8b8] shrink-0">${agent.price_usd.toFixed(2)}</span>
+          <span className="text-[#fdba74] shrink-0">${agent.price_usd.toFixed(2)}</span>
         </div>
         <div className="text-white/35 text-[10px] mt-1.5">tx 0x82c…f9a3 · just now</div>
         <div className="flex gap-1 mt-2.5">
@@ -137,7 +137,7 @@ function FloatingReceipt({ agent }: { agent: AgentManifest | null }) {
             <div
               key={i}
               className="flex-1 h-[2px] rounded-[1px]"
-              style={{ background: i % 3 === 0 ? "#7c6aff" : "rgba(255,255,255,0.14)" }}
+              style={{ background: i % 3 === 0 ? "#f97316" : "rgba(255,255,255,0.14)" }}
             />
           ))}
         </div>
@@ -177,7 +177,7 @@ function FauxQR({ size = 168 }: { size?: number }) {
   }, []);
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="block">
-      <rect width={size} height={size} fill="#16161f" rx="6" />
+      <rect width={size} height={size} fill="#17130f" rx="6" />
       {pattern.flatMap((row, r) =>
         row.map((v, c) =>
           v ? (
@@ -204,7 +204,7 @@ function HowItWorks({ heroAgent }: { heroAgent: AgentManifest | null }) {
         <div className="text-center">
           <div className="font-mono text-[11px] tracking-[0.2em] uppercase text-white/40">how it works</div>
           <h2 className="mt-3.5 text-3xl sm:text-4xl font-semibold tracking-tight leading-[1.08]">
-            Three steps. <span className="text-[#7c6aff] italic font-medium">No accounts.</span>
+            Three steps. <span className="text-[#f97316] font-medium">No accounts.</span>
           </h2>
         </div>
 
@@ -219,7 +219,7 @@ function HowItWorks({ heroAgent }: { heroAgent: AgentManifest | null }) {
                 </svg>
                 <div className="flex-1 text-[13px] text-white">
                   make a logo
-                  <span className="inline-block w-px h-3.5 bg-[#7c6aff] ml-0.5 align-middle" style={{ animation: "blink 1s steps(2) infinite" }} />
+                  <span className="inline-block w-px h-3.5 bg-[#f97316] ml-0.5 align-middle" style={{ animation: "blink 1s steps(2) infinite" }} />
                 </div>
               </div>
               <div className="mt-2.5 flex flex-col gap-1.5">
@@ -230,11 +230,11 @@ function HowItWorks({ heroAgent }: { heroAgent: AgentManifest | null }) {
                   <div
                     key={a.name}
                     className={`flex justify-between items-center px-3 py-2 rounded-lg ${
-                      a.highlight ? "bg-[#7c6aff]/14 border border-[#7c6aff]/35" : "bg-white/[0.025] border border-white/[0.07]"
+                      a.highlight ? "bg-[#f97316]/14 border border-[#f97316]/35" : "bg-white/[0.025] border border-white/[0.07]"
                     }`}
                   >
                     <span className="font-mono text-xs text-white/55">{a.name}</span>
-                    <span className="font-mono text-xs text-[#4fd8b8]">${a.price.toFixed(2)}</span>
+                    <span className="font-mono text-xs text-[#fdba74]">${a.price.toFixed(2)}</span>
                   </div>
                 ))}
               </div>
@@ -244,21 +244,21 @@ function HowItWorks({ heroAgent }: { heroAgent: AgentManifest | null }) {
           {/* Step 2 — Scan QR (featured) */}
           <Step number="02" title="Scan the QR" body="One QR code = one payment = one result. Use any wallet that holds USDC on Base." featured>
             <div className="flex justify-center px-4 pb-5 pt-2">
-              <div className="relative p-3 bg-[#0a0a0f] border border-white/[0.07] rounded-2xl">
+              <div className="relative p-3 bg-[#0b0907] border border-white/[0.07] rounded-2xl">
                 <FauxQR size={168} />
                 <div
                   className="absolute left-4 right-4 top-4 h-0.5"
                   style={{
-                    background: "linear-gradient(90deg, transparent, #7c6aff, transparent)",
-                    boxShadow: "0 0 16px 2px #7c6aff",
+                    background: "linear-gradient(90deg, transparent, #f97316, transparent)",
+                    boxShadow: "0 0 16px 2px #f97316",
                     animation: "scan-line 2.2s ease-in-out infinite",
                   }}
                 />
-                <div className="absolute inset-3 border border-[#7c6aff]/30 rounded-md pointer-events-none" />
+                <div className="absolute inset-3 border border-[#f97316]/30 rounded-md pointer-events-none" />
               </div>
             </div>
             <div className="px-4 pb-4 text-center font-mono text-xs">
-              <div className="text-[#4fd8b8] text-base mb-0.5">
+              <div className="text-[#fdba74] text-base mb-0.5">
                 ${(heroAgent?.price_usd ?? 0.05).toFixed(2)} USDC
               </div>
               <div className="text-white/35">
@@ -274,18 +274,18 @@ function HowItWorks({ heroAgent }: { heroAgent: AgentManifest | null }) {
                 className="aspect-square rounded-lg border border-white/[0.07] relative overflow-hidden"
                 style={{
                   background:
-                    "linear-gradient(135deg, color-mix(in oklab, #7c6aff 40%, #1c1c2a), color-mix(in oklab, #7c6aff 5%, #0e0e14))",
+                    "linear-gradient(135deg, color-mix(in oklab, #f97316 40%, #1c1c2a), color-mix(in oklab, #f97316 5%, #0e0e14))",
                 }}
               >
                 <div
                   className="absolute inset-0"
                   style={{
                     background:
-                      "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3), transparent 40%), radial-gradient(circle at 70% 65%, color-mix(in oklab, #4fd8b8 40%, transparent), transparent 50%)",
+                      "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3), transparent 40%), radial-gradient(circle at 70% 65%, color-mix(in oklab, #fdba74 40%, transparent), transparent 50%)",
                   }}
                 />
                 <div className="absolute bottom-2 left-2 right-2 flex items-center gap-1.5 text-[10px] font-mono text-white/80">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4fd8b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fdba74" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="m5 12 4 4L19 6" />
                   </svg>
                   generated · 2.4s
@@ -320,13 +320,13 @@ function Step({
     <div
       className={`flex flex-col rounded-2xl border overflow-hidden relative ${
         featured
-          ? "bg-gradient-to-b from-[#7c6aff]/[0.06] to-[#16161f] border-[#7c6aff]/30 shadow-[0_30px_80px_-40px_rgba(124,106,255,0.4)]"
-          : "bg-[#16161f] border-white/[0.07]"
+          ? "bg-gradient-to-b from-[#f97316]/[0.06] to-[#17130f] border-[#f97316]/30 shadow-[0_30px_80px_-40px_rgba(249,115,22,0.4)]"
+          : "bg-[#17130f] border-white/[0.07]"
       }`}
     >
       <div className="px-5 pt-5 pb-1.5">
         <div className="flex items-center gap-2.5 mb-3">
-          <span className={`font-mono text-[11px] tracking-wider ${featured ? "text-[#7c6aff]" : "text-white/35"}`}>{number}</span>
+          <span className={`font-mono text-[11px] tracking-wider ${featured ? "text-[#f97316]" : "text-white/35"}`}>{number}</span>
           <div className="flex-1 h-px bg-white/[0.07]" />
         </div>
         <h3 className="m-0 text-xl font-semibold tracking-tight">{title}</h3>
@@ -345,7 +345,7 @@ function FAQ() {
         <div className="text-center">
           <div className="font-mono text-[11px] tracking-[0.2em] uppercase text-white/40">frequently asked</div>
           <h2 className="mt-3.5 text-3xl sm:text-4xl font-semibold tracking-tight leading-[1.08]">
-            Questions, <span className="text-[#7c6aff] italic font-medium">answered plainly.</span>
+            Questions, <span className="text-[#f97316] font-medium">answered plainly.</span>
           </h2>
         </div>
         <div className="mt-11 flex flex-col gap-2">
@@ -367,7 +367,7 @@ function FAQRow({ item, isOpen, onToggle }: { item: { q: string; a: string }; is
   return (
     <div
       className={`rounded-xl overflow-hidden transition-all border ${
-        isOpen ? "bg-[#16161f] border-[#7c6aff]/20" : "bg-white/[0.018] border-white/[0.07]"
+        isOpen ? "bg-[#17130f] border-[#f97316]/20" : "bg-white/[0.018] border-white/[0.07]"
       }`}
     >
       <button
@@ -375,7 +375,7 @@ function FAQRow({ item, isOpen, onToggle }: { item: { q: string; a: string }; is
         className="w-full flex items-center justify-between px-5 py-4 text-left"
       >
         <span className="text-base font-medium text-white">{item.q}</span>
-        <span className="w-7 h-7 rounded-full bg-white/[0.04] grid place-items-center text-[#7c6aff] shrink-0">
+        <span className="w-7 h-7 rounded-full bg-white/[0.04] grid place-items-center text-[#f97316] shrink-0">
           {isOpen ? (
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /></svg>
           ) : (
@@ -398,14 +398,14 @@ function FeaturedAgentCard({ agent }: { agent: AgentManifest }) {
   return (
     <a
       href={`/agent/${agent.ens}`}
-      className="group flex flex-col gap-4 p-[18px] bg-[#16161f] border border-white/[0.07] hover:border-[#7c6aff]/30 rounded-2xl transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-20px_rgba(124,106,255,0.22)]"
+      className="group flex flex-col gap-4 p-[18px] bg-[#17130f] border border-white/[0.07] hover:border-[#f97316]/30 rounded-2xl transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-20px_rgba(249,115,22,0.22)]"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="w-[46px] h-[46px] rounded-[11px] bg-gradient-to-br from-[#2a2358] to-[#1a1530] border border-white/[0.07] grid place-items-center text-2xl">
           {glyph}
         </div>
         <div className="text-right shrink-0">
-          <div className="font-mono text-lg text-[#4fd8b8] font-medium">${agent.price_usd.toFixed(2)}</div>
+          <div className="font-mono text-lg text-[#fdba74] font-medium">${agent.price_usd.toFixed(2)}</div>
           <div className="font-mono text-[10px] text-white/30 tracking-wider uppercase">per request</div>
         </div>
       </div>
@@ -496,37 +496,63 @@ export default function Home() {
   return (
     <div>
       {/* HERO */}
-      <section className={`relative px-4 sm:px-7 ${!searched ? "pt-16 pb-20" : "pt-16 pb-6"}`}>
-        <div className="max-w-5xl mx-auto relative">
+      <section className={`relative overflow-hidden px-5 sm:px-6 ${!searched ? "pt-[72px] pb-20" : "pt-16 pb-6"}`}>
+        {/* X402 watermark. line-height must stay >= 1 or the glyph ink overflows
+            its line box and the section's overflow-hidden clips it; the mask
+            fade must not start before ~80% or the letterforms go before they
+            read. */}
+        {!searched && (
+          <div
+            aria-hidden="true"
+            className="absolute top-0 left-1/2 -translate-x-1/2 w-[120%] text-center pointer-events-none select-none font-display font-bold"
+            style={{
+              fontSize: "clamp(180px,26vw,400px)",
+              lineHeight: 1.15,
+              letterSpacing: "-0.05em",
+              color: "transparent",
+              WebkitTextStroke: "1.5px color-mix(in oklab, var(--a) 40%, transparent)",
+              opacity: 0.4,
+              maskImage: "linear-gradient(180deg, rgba(0,0,0,1) 82%, transparent 100%)",
+              WebkitMaskImage: "linear-gradient(180deg, rgba(0,0,0,1) 82%, transparent 100%)",
+            }}
+          >
+            X402
+          </div>
+        )}
+
+        <div className="max-w-[1040px] mx-auto relative">
           {!searched && <FloatingReceipt agent={receiptAgent} />}
 
-          <div className="flex justify-center mb-6">
+          <div className="flex mb-6">
             <LiveTickerEyebrow agents={tickerAgents} />
           </div>
 
-          <h1 className="text-center m-0 text-5xl sm:text-6xl lg:text-7xl font-semibold tracking-tight leading-[0.98] text-balance">
+          <h1
+            className="m-0 font-display font-bold text-[clamp(60px,10.5vw,132px)] leading-[0.9] tracking-[-0.045em]"
+            style={{ maxWidth: "15ch" }}
+          >
             <span className="block">Anything you need,</span>
-            <span className="block text-[#7c6aff] italic font-medium">for pennies.</span>
+            <span className="block text-[#f97316] font-medium">for pennies.</span>
           </h1>
 
-          <p className="text-center max-w-xl mx-auto mt-7 text-[17px] text-white/55 leading-[1.55] text-balance">
+          <p className="max-w-[560px] mt-7 text-[17px] text-[#eef0f6]/60 leading-[1.55] [text-wrap:pretty]">
             Search a marketplace of AI agents — image, audio, code, data. Pay per request in pennies.{" "}
             <span className="text-white">No email. No signup. No wallet connect.</span>
           </p>
 
           {/* Search */}
-          <div className="max-w-2xl mx-auto mt-10">
+          <div className="max-w-[660px] mt-10">
             <SearchBar onSearch={handleSearch} />
           </div>
 
           {/* Category shortcuts */}
           {!searched && (
-            <div className="flex flex-wrap justify-center gap-2 mt-5">
+            <div className="flex flex-wrap gap-2.5 mt-5">
               {SHORTCUTS.map((s) => (
                 <button
                   key={s.label}
                   onClick={() => handleSearch(s.q)}
-                  className="px-3.5 py-2 bg-white/[0.025] hover:bg-[#7c6aff]/10 border border-white/[0.07] hover:border-[#7c6aff]/30 rounded-lg text-sm text-white/55 hover:text-white transition-all"
+                  className="px-3.5 py-2.5 bg-white/[0.03] hover:bg-[#f97316]/10 border border-white/[0.08] hover:border-[#f97316]/45 rounded-[10px] text-sm text-[#eef0f6]/60 hover:text-white transition-all"
                 >
                   {s.label}
                 </button>
@@ -534,18 +560,33 @@ export default function Home() {
             </div>
           )}
 
-          {/* Live platform stats — only real numbers */}
+          {/* Live platform stats — real values from /stats, and only the
+              non-zero ones. Never render a placeholder number here. */}
           {!searched && stats && (stats.permanent_agents > 0 || stats.total_transactions > 0 || stats.total_usdc_volume > 0) && (
-            <div className="flex items-center justify-center gap-7 mt-11 font-mono">
-              {stats.permanent_agents > 0 && (
-                <>
-                  <Stat value={stats.permanent_agents.toLocaleString()} label="permanent agents" />
-                  <Divider />
-                </>
-              )}
-              <Stat value={stats.total_transactions.toLocaleString()} label="paid requests" />
-              <Divider />
-              <Stat value={`$${(stats.total_usdc_volume / 1_000_000).toFixed(2)}`} label="USDC processed" accent />
+            <div className="flex flex-wrap items-center gap-x-7 gap-y-4 mt-11 font-mono">
+              {[
+                stats.permanent_agents > 0 && (
+                  <Stat key="agents" value={stats.permanent_agents.toLocaleString()} label="permanent agents" />
+                ),
+                stats.total_transactions > 0 && (
+                  <Stat key="reqs" value={stats.total_transactions.toLocaleString()} label="paid requests" />
+                ),
+                stats.total_usdc_volume > 0 && (
+                  <Stat
+                    key="vol"
+                    value={`$${(stats.total_usdc_volume / 1_000_000).toFixed(2)}`}
+                    label="USDC processed"
+                    accent
+                  />
+                ),
+              ]
+                .filter(Boolean)
+                .map((node, i) => (
+                  <div key={i} className="flex items-center gap-x-7">
+                    {i > 0 && <Divider />}
+                    {node}
+                  </div>
+                ))}
             </div>
           )}
         </div>
@@ -643,7 +684,7 @@ export default function Home() {
               <div className="text-center">
                 <div className="font-mono text-[11px] tracking-[0.2em] uppercase text-white/40">ecosystem partners</div>
                 <h2 className="mt-3.5 text-3xl sm:text-4xl font-semibold tracking-tight leading-[1.08]">
-                  Building on <span className="text-[#7c6aff] italic font-medium">sources.eth.</span>
+                  Building on <span className="text-[#f97316] font-medium">sources.eth.</span>
                 </h2>
               </div>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 mt-10">
@@ -651,7 +692,7 @@ export default function Home() {
                   <a
                     key={i}
                     href="mailto:hector.morel809@gmail.com?subject=sources.eth%20Ecosystem%20Partner"
-                    className="group flex flex-col gap-4 p-5 bg-white/[0.025] hover:bg-[#7c6aff]/[0.06] border border-dashed border-white/[0.14] hover:border-[#7c6aff]/30 rounded-2xl transition-all min-h-[156px]"
+                    className="group flex flex-col gap-4 p-5 bg-white/[0.025] hover:bg-[#f97316]/[0.06] border border-dashed border-white/[0.14] hover:border-[#f97316]/30 rounded-2xl transition-all min-h-[156px]"
                   >
                     <div className="w-[38px] h-[38px] rounded-[9px] bg-white/[0.04] border border-white/[0.07] grid place-items-center font-mono text-[13px] text-white/35">
                       {i}
@@ -665,7 +706,7 @@ export default function Home() {
               </div>
               <p className="text-center text-xs text-white/35 mt-5">
                 Interested in sponsoring?{" "}
-                <a href="mailto:hector.morel809@gmail.com?subject=sources.eth%20Ecosystem%20Partner" className="text-[#7c6aff] hover:text-[#9a8cff]">
+                <a href="mailto:hector.morel809@gmail.com?subject=sources.eth%20Ecosystem%20Partner" className="text-[#f97316] hover:text-[#fdba74]">
                   Get in touch →
                 </a>
               </p>
@@ -680,13 +721,13 @@ export default function Home() {
                   <div>
                     <div className="font-mono text-[11px] tracking-[0.2em] uppercase text-white/40">featured agents</div>
                     <h2 className="mt-3.5 text-3xl sm:text-4xl font-semibold tracking-tight leading-[1.08]">
-                      Live, paid, <span className="text-[#7c6aff] italic font-medium">popular today.</span>
+                      Live, paid, <span className="text-[#f97316] font-medium">popular today.</span>
                     </h2>
                   </div>
                   {stats && stats.permanent_agents > 0 && (
                     <button
                       onClick={() => handleSearch("agent")}
-                      className="inline-flex items-center gap-1.5 text-sm text-[#7c6aff] hover:text-[#9a8cff] transition-colors"
+                      className="inline-flex items-center gap-1.5 text-sm text-[#f97316] hover:text-[#fdba74] transition-colors"
                     >
                       Browse all {stats.permanent_agents.toLocaleString()} agents →
                     </button>
@@ -711,13 +752,17 @@ export default function Home() {
 
 function Stat({ value, label, accent }: { value: string; label: string; accent?: boolean }) {
   return (
-    <div className="text-center">
-      <div className={`text-lg font-medium ${accent ? "text-[#4fd8b8]" : "text-white"}`}>{value}</div>
-      <div className="text-[11px] text-white/35 tracking-wider uppercase mt-0.5 font-mono">{label}</div>
+    <div className="text-left">
+      <div className={`text-[19px] font-medium whitespace-nowrap ${accent ? "text-[#fdba74]" : "text-white"}`}>
+        {value}
+      </div>
+      <div className="text-[11px] text-[#eef0f6]/[0.38] tracking-[0.07em] uppercase mt-0.5 font-mono whitespace-nowrap">
+        {label}
+      </div>
     </div>
   );
 }
 
 function Divider() {
-  return <div className="w-px h-6 bg-white/[0.07]" />;
+  return <div className="w-px h-[26px] bg-white/[0.08]" />;
 }

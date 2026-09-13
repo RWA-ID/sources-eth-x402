@@ -48,7 +48,7 @@ export default function DemoPage() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-12">
       {/* Demo banner */}
-      <div className="mb-8 px-4 py-2.5 bg-[#7c6aff]/10 border border-[#7c6aff]/20 rounded-lg text-sm text-[#7c6aff] text-center">
+      <div className="mb-8 px-4 py-2.5 bg-[#f97316]/10 border border-[#f97316]/20 rounded-lg text-sm text-[#f97316] text-center">
         UI Preview — this is a demo with mock data
       </div>
 
@@ -61,8 +61,8 @@ export default function DemoPage() {
           <h1 className="text-2xl font-bold mb-1">{MOCK_AGENT.display_name}</h1>
           <p className="text-white/50 mb-2">{MOCK_AGENT.description}</p>
           <div className="flex items-center gap-3 flex-wrap">
-            <span className="font-mono text-sm text-[#7c6aff]">{MOCK_AGENT.ens}</span>
-            <span className="font-mono text-sm text-[#4fd8b8]">${MOCK_AGENT.price_usd.toFixed(2)}</span>
+            <span className="font-mono text-sm text-[#f97316]">{MOCK_AGENT.ens}</span>
+            <span className="font-mono text-sm text-[#fdba74]">${MOCK_AGENT.price_usd.toFixed(2)}</span>
             <span className="text-sm text-white/25">~8s</span>
           </div>
           <div className="mt-2">
@@ -88,12 +88,12 @@ export default function DemoPage() {
             onChange={(e) => setPrompt(e.target.value)}
             placeholder="A futuristic city at night with neon lights reflecting on rain-soaked streets..."
             rows={4}
-            className="w-full px-4 py-3 bg-[#16161f] border border-white/[0.07] rounded-xl text-white placeholder-white/25 focus:outline-none focus:border-[#7c6aff]/50 focus:ring-1 focus:ring-[#7c6aff]/30 transition-all resize-none"
+            className="w-full px-4 py-3 bg-[#17130f] border border-white/[0.07] rounded-xl text-white placeholder-white/25 focus:outline-none focus:border-[#f97316]/50 focus:ring-1 focus:ring-[#f97316]/30 transition-all resize-none"
           />
           <button
             onClick={() => setStep("paying")}
             disabled={!prompt}
-            className="w-full py-3 bg-[#7c6aff] hover:bg-[#6b59ee] disabled:opacity-40 disabled:cursor-not-allowed rounded-xl font-medium transition-all"
+            className="w-full py-3 bg-[#f97316] hover:bg-[#ea6a0c] disabled:opacity-40 disabled:cursor-not-allowed rounded-xl font-medium transition-all"
           >
             Pay $0.05 &amp; generate
           </button>
@@ -106,7 +106,7 @@ export default function DemoPage() {
       {/* Step: Result */}
       {step === "result" && (
         <div className="space-y-4">
-          <div className="bg-[#16161f] border border-white/[0.07] rounded-xl overflow-hidden">
+          <div className="bg-[#17130f] border border-white/[0.07] rounded-xl overflow-hidden">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={MOCK_RESULT.url} alt="Generated result" className="w-full" />
           </div>

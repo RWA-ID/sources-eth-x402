@@ -48,7 +48,7 @@ export function PaymentModal({
       QRCode.toCanvas(canvasRef.current, accept.payTo, {
         width: 220,
         margin: 2,
-        color: { dark: "#ffffff", light: "#16161f" },
+        color: { dark: "#ffffff", light: "#17130f" },
       });
     }
   }, [accept.payTo]);
@@ -98,7 +98,7 @@ export function PaymentModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-      <div className="bg-[#16161f] border border-white/[0.07] rounded-2xl p-6 max-w-sm w-full shadow-[0_0_60px_rgba(124,106,255,0.15)]">
+      <div className="bg-[#17130f] border border-white/[0.07] rounded-2xl p-6 max-w-sm w-full shadow-[0_0_60px_rgba(249,115,22,0.15)]">
 
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
@@ -112,26 +112,26 @@ export function PaymentModal({
 
         {/* Amount */}
         <div className="text-center mb-5">
-          <div className="text-3xl font-bold text-[#4fd8b8] mb-1">${amountUsd} USDC</div>
+          <div className="text-3xl font-bold text-[#fdba74] mb-1">${amountUsd} USDC</div>
           <div className="text-sm text-white/40">{agentName} · Base network</div>
         </div>
 
         {/* QR — plain address, scan with any wallet */}
         <div className="flex justify-center mb-4">
-          <div className="block p-3 bg-[#111118] rounded-xl border border-white/[0.07]">
+          <div className="block p-3 bg-[#100d0a] rounded-xl border border-white/[0.07]">
             <canvas ref={canvasRef} className="rounded" />
           </div>
         </div>
 
         {/* Instructions */}
         <ol className="space-y-1.5 text-xs text-white/40 mb-4 px-1">
-          <li><span className="text-white/60">1.</span> Scan QR with your wallet — send <span className="text-[#4fd8b8]">${amountUsd} USDC</span> on <span className="text-white/60">Base</span></li>
+          <li><span className="text-white/60">1.</span> Scan QR with your wallet — send <span className="text-[#fdba74]">${amountUsd} USDC</span> on <span className="text-white/60">Base</span></li>
           <li><span className="text-white/60">2.</span> Select USDC on Base network and confirm the transfer</li>
           <li><span className="text-white/60">3.</span> Come back here — payment detected automatically</li>
         </ol>
 
         {/* Address copy */}
-        <div className="bg-[#111118] border border-white/[0.07] rounded-lg px-3 py-2.5 mb-3">
+        <div className="bg-[#100d0a] border border-white/[0.07] rounded-lg px-3 py-2.5 mb-3">
           <div className="text-xs text-white/30 mb-1">Or copy address (USDC · Base)</div>
           <div className="flex items-center gap-2">
             <span className="font-mono text-xs text-white/60 flex-1 truncate">{accept.payTo}</span>
@@ -146,7 +146,7 @@ export function PaymentModal({
 
         {/* Status / CTA */}
         {detected ? (
-          <div className="w-full py-2.5 bg-[#4fd8b8]/20 border border-[#4fd8b8]/30 rounded-lg text-sm font-medium text-[#4fd8b8] text-center">
+          <div className="w-full py-2.5 bg-[#fdba74]/20 border border-[#fdba74]/30 rounded-lg text-sm font-medium text-[#fdba74] text-center">
             ✓ Payment detected — processing...
           </div>
         ) : polling ? (
@@ -159,7 +159,7 @@ export function PaymentModal({
         ) : (
           <button
             onClick={startPolling}
-            className="w-full py-2.5 bg-[#7c6aff] hover:bg-[#6b59ee] rounded-lg text-sm font-medium transition-all"
+            className="w-full py-2.5 bg-[#f97316] hover:bg-[#ea6a0c] rounded-lg text-sm font-medium transition-all"
           >
             I&apos;ve paid — watch for confirmation
           </button>

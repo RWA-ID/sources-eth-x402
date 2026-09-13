@@ -8,10 +8,10 @@ import { InlineAgentPanel } from "./InlineAgentPanel";
 
 function serviceTypeBadge(name: string): string {
   switch (name.toLowerCase()) {
-    case "mcp":   return "bg-[#7c6aff]/10 border-[#7c6aff]/30 text-[#7c6aff]";
+    case "mcp":   return "bg-[#f97316]/10 border-[#f97316]/30 text-[#f97316]";
     case "a2a":   return "bg-[#f59e0b]/10 border-[#f59e0b]/30 text-[#f59e0b]";
     case "oasf":  return "bg-[#3b82f6]/10 border-[#3b82f6]/30 text-[#3b82f6]";
-    case "web":   return "bg-[#4fd8b8]/10 border-[#4fd8b8]/30 text-[#4fd8b8]";
+    case "web":   return "bg-[#fdba74]/10 border-[#fdba74]/30 text-[#fdba74]";
     case "email": return "bg-white/[0.05] border-white/[0.12] text-white/40";
     default:      return "bg-white/[0.05] border-white/[0.08] text-white/50";
   }
@@ -37,7 +37,7 @@ export function Erc8004AgentPanel({ agent, onClose }: Erc8004AgentPanelProps) {
   // If agent is registered on sources.eth, hand off to full interaction panel
   if (fetchingManifest) {
     return (
-      <div className="mt-2 bg-[#16161f] border border-[#7c6aff]/30 rounded-xl p-5 flex items-center gap-3 text-white/30 text-sm animate-pulse">
+      <div className="mt-2 bg-[#17130f] border border-[#f97316]/30 rounded-xl p-5 flex items-center gap-3 text-white/30 text-sm animate-pulse">
         <svg className="w-4 h-4 animate-spin flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
         </svg>
@@ -59,7 +59,7 @@ export function Erc8004AgentPanel({ agent, onClose }: Erc8004AgentPanelProps) {
   )}`;
 
   return (
-    <div className="mt-2 bg-[#16161f] border border-white/[0.12] rounded-xl overflow-hidden">
+    <div className="mt-2 bg-[#17130f] border border-white/[0.12] rounded-xl overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-3 border-b border-white/[0.06]">
         <div className="flex items-center gap-2.5">
@@ -72,7 +72,7 @@ export function Erc8004AgentPanel({ agent, onClose }: Erc8004AgentPanelProps) {
             ERC-8004 #{agent.agentId}
           </span>
           {agent.x402Support && (
-            <span className="px-1.5 py-0.5 bg-[#4fd8b8]/10 border border-[#4fd8b8]/20 rounded text-[10px] font-mono text-[#4fd8b8]">
+            <span className="px-1.5 py-0.5 bg-[#fdba74]/10 border border-[#fdba74]/20 rounded text-[10px] font-mono text-[#fdba74]">
               x402 native
             </span>
           )}
@@ -116,7 +116,7 @@ export function Erc8004AgentPanel({ agent, onClose }: Erc8004AgentPanelProps) {
         </div>
 
         {/* Not registered CTA */}
-        <div className="bg-[#7c6aff]/10 border border-[#7c6aff]/20 rounded-xl p-4 space-y-3">
+        <div className="bg-[#f97316]/10 border border-[#f97316]/20 rounded-xl p-4 space-y-3">
           <div className="text-sm font-medium text-white/80">
             This agent is on ERC-8004 but not listed on sources.eth
           </div>
@@ -128,7 +128,7 @@ export function Erc8004AgentPanel({ agent, onClose }: Erc8004AgentPanelProps) {
           </p>
           <a
             href={registerUrl}
-            className="block w-full text-center py-2.5 bg-[#7c6aff] hover:bg-[#6b59ee] rounded-lg text-sm font-medium transition-all"
+            className="block w-full text-center py-2.5 bg-[#f97316] hover:bg-[#ea6a0c] rounded-lg text-sm font-medium transition-all"
           >
             List this agent — free 15-day trial →
           </a>

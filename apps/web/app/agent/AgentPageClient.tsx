@@ -133,7 +133,7 @@ export default function AgentPageClient({ ens }: { ens: string }) {
         <div className="text-4xl mb-4">⚠️</div>
         <h1 className="text-xl font-semibold mb-2">Could not load agent</h1>
         <p className="text-white/40 text-sm mb-4 font-mono">{fetchError}</p>
-        <a href="/" className="text-[#7c6aff] text-sm hover:underline">← Back to search</a>
+        <a href="/" className="text-[#f97316] text-sm hover:underline">← Back to search</a>
       </div>
     );
   }
@@ -148,7 +148,7 @@ export default function AgentPageClient({ ens }: { ens: string }) {
         </p>
         <button
           onClick={handleUpgrade}
-          className="px-6 py-3 bg-[#7c6aff] hover:bg-[#6b59ee] rounded-lg font-medium transition-all"
+          className="px-6 py-3 bg-[#f97316] hover:bg-[#ea6a0c] rounded-lg font-medium transition-all"
         >
           Upgrade for $39
         </button>
@@ -195,8 +195,8 @@ export default function AgentPageClient({ ens }: { ens: string }) {
           <h1 className="text-2xl font-bold mb-1">{agent.display_name}</h1>
           <p className="text-white/50 mb-2">{agent.description}</p>
           <div className="flex items-center gap-3 flex-wrap">
-            <span className="font-mono text-sm text-[#7c6aff]">{agent.ens}</span>
-            <span className="font-mono text-sm text-[#4fd8b8]">${agent.price_usd.toFixed(2)}</span>
+            <span className="font-mono text-sm text-[#f97316]">{agent.ens}</span>
+            <span className="font-mono text-sm text-[#fdba74]">${agent.price_usd.toFixed(2)}</span>
             {agent.avg_latency_ms && (
               <span className="text-sm text-white/25">~{(agent.avg_latency_ms / 1000).toFixed(1)}s</span>
             )}
@@ -229,13 +229,13 @@ export default function AgentPageClient({ ens }: { ens: string }) {
             placeholder="Enter your prompt..."
             rows={4}
             maxLength={1000}
-            className="w-full px-4 py-3 bg-[#16161f] border border-white/[0.07] rounded-xl text-white placeholder-white/25 focus:outline-none focus:border-[#7c6aff]/50 focus:ring-1 focus:ring-[#7c6aff]/30 transition-all resize-none"
+            className="w-full px-4 py-3 bg-[#17130f] border border-white/[0.07] rounded-xl text-white placeholder-white/25 focus:outline-none focus:border-[#f97316]/50 focus:ring-1 focus:ring-[#f97316]/30 transition-all resize-none"
           />
           {error && <p className="text-red-400 text-sm">{error}</p>}
           <button
             onClick={handleGenerate}
             disabled={!prompt || generating}
-            className="w-full py-3 bg-[#7c6aff] hover:bg-[#6b59ee] disabled:opacity-40 disabled:cursor-not-allowed rounded-xl font-medium transition-all"
+            className="w-full py-3 bg-[#f97316] hover:bg-[#ea6a0c] disabled:opacity-40 disabled:cursor-not-allowed rounded-xl font-medium transition-all"
           >
             {generating ? "Generating..." : `Pay $${agent.price_usd.toFixed(2)} & generate`}
           </button>

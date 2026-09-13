@@ -97,10 +97,10 @@ interface AgentCardProps {
 
 function serviceTypeBadge(name: string): string {
   switch (name.toLowerCase()) {
-    case "mcp":   return "bg-[#7c6aff]/10 border-[#7c6aff]/30 text-[#7c6aff]";
+    case "mcp":   return "bg-[#f97316]/10 border-[#f97316]/30 text-[#f97316]";
     case "a2a":   return "bg-[#f59e0b]/10 border-[#f59e0b]/30 text-[#f59e0b]";
     case "oasf":  return "bg-[#3b82f6]/10 border-[#3b82f6]/30 text-[#3b82f6]";
-    case "web":   return "bg-[#4fd8b8]/10 border-[#4fd8b8]/30 text-[#4fd8b8]";
+    case "web":   return "bg-[#fdba74]/10 border-[#fdba74]/30 text-[#fdba74]";
     case "email": return "bg-white/[0.05] border-white/[0.12] text-white/40";
     default:      return "bg-white/[0.03] border-white/[0.07] text-white/25";
   }
@@ -113,9 +113,9 @@ interface Erc8004AgentCardProps {
 }
 
 export function Erc8004AgentCard({ agent, onSelect, selected }: Erc8004AgentCardProps) {
-  const cls = `flex items-center gap-4 px-5 py-4 bg-[#16161f] border rounded-xl transition-all group w-full text-left ${
+  const cls = `flex items-center gap-4 px-5 py-4 bg-[#17130f] border rounded-xl transition-all group w-full text-left ${
     selected
-      ? "border-[#7c6aff]/60 shadow-[0_0_24px_rgba(124,106,255,0.15)]"
+      ? "border-[#f97316]/60 shadow-[0_0_24px_rgba(249,115,22,0.15)]"
       : "border-white/[0.07] hover:border-white/20"
   }`;
 
@@ -138,7 +138,7 @@ export function Erc8004AgentCard({ agent, onSelect, selected }: Erc8004AgentCard
             {agent.name}
           </span>
           {agent.x402Support && (
-            <span className="px-1.5 py-0.5 bg-[#4fd8b8]/10 border border-[#4fd8b8]/20 rounded text-[10px] font-mono text-[#4fd8b8] flex-shrink-0">
+            <span className="px-1.5 py-0.5 bg-[#fdba74]/10 border border-[#fdba74]/20 rounded text-[10px] font-mono text-[#fdba74] flex-shrink-0">
               x402
             </span>
           )}
@@ -212,7 +212,7 @@ export function AgentCard({ agent, rating, onSelect, selected }: AgentCardProps)
       {/* Main info */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-0.5">
-          <span className="font-semibold text-white group-hover:text-[#7c6aff] transition-colors truncate">
+          <span className="font-semibold text-white group-hover:text-[#f97316] transition-colors truncate">
             {agent.display_name}
           </span>
           {agent.human_verified && (
@@ -234,7 +234,7 @@ export function AgentCard({ agent, rating, onSelect, selected }: AgentCardProps)
         </div>
         <p className="text-sm text-white/45 truncate mb-1.5">{agent.description}</p>
         <div className="flex items-center gap-3">
-          <span className="font-mono text-xs text-[#7c6aff]/60 truncate">{agent.ens}</span>
+          <span className="font-mono text-xs text-[#f97316]/60 truncate">{agent.ens}</span>
           {rating && (
             <StarRating avg={rating.avg} count={rating.count} size="sm" />
           )}
@@ -244,7 +244,7 @@ export function AgentCard({ agent, rating, onSelect, selected }: AgentCardProps)
       {/* Price + share */}
       <div className="flex-shrink-0 flex items-center gap-1.5">
         <div className="text-right">
-          <div className="font-mono font-semibold text-[#4fd8b8]">{priceLabel}</div>
+          <div className="font-mono font-semibold text-[#fdba74]">{priceLabel}</div>
           <div className="text-xs text-white/25 mt-0.5">per gen</div>
         </div>
         <ShareMenu agent={agent} />
@@ -252,10 +252,10 @@ export function AgentCard({ agent, rating, onSelect, selected }: AgentCardProps)
     </>
   );
 
-  const cls = `flex items-center gap-4 px-5 py-4 bg-[#16161f] border rounded-xl transition-all group ${
+  const cls = `flex items-center gap-4 px-5 py-4 bg-[#17130f] border rounded-xl transition-all group ${
     selected
-      ? "border-[#7c6aff]/60 shadow-[0_0_24px_rgba(124,106,255,0.15)]"
-      : "border-white/[0.07] hover:border-[#7c6aff]/30 hover:shadow-[0_0_24px_rgba(124,106,255,0.08)]"
+      ? "border-[#f97316]/60 shadow-[0_0_24px_rgba(249,115,22,0.15)]"
+      : "border-white/[0.07] hover:border-[#f97316]/30 hover:shadow-[0_0_24px_rgba(249,115,22,0.08)]"
   }`;
 
   if (onSelect) {

@@ -45,7 +45,7 @@ export default function ContactPage() {
   };
 
   const inputClass =
-    "w-full px-4 py-3 bg-[#16161f] border border-white/[0.07] rounded-lg text-white placeholder-white/25 font-display focus:outline-none focus:border-[#7c6aff]/50 focus:ring-1 focus:ring-[#7c6aff]/30 transition-all";
+    "w-full px-4 py-3 bg-[#17130f] border border-white/[0.07] rounded-[11px] text-white placeholder-white/25 font-sans focus:outline-none focus:border-[#f97316]/50 focus:ring-1 focus:ring-[#f97316]/30 transition-all";
 
   return (
     <div className="px-4 sm:px-7 py-16">
@@ -55,7 +55,7 @@ export default function ContactPage() {
           <div className="font-mono text-[11px] tracking-[0.2em] uppercase text-white/40">get in touch</div>
           <h1 className="mt-4 text-4xl sm:text-5xl font-semibold tracking-tight leading-[1.05]">
             Builder, partner,<br />
-            <span className="text-[#7c6aff] italic font-medium">or just curious?</span>
+            <span className="text-[#f97316] font-medium">or just curious?</span>
           </h1>
           <p className="mt-5 mx-auto max-w-md text-base text-white/55 leading-relaxed">
             We read every message. Tell us what you're working on, what's broken, or what we should build next.
@@ -73,8 +73,8 @@ export default function ContactPage() {
                 onClick={() => setType(t.id)}
                 className={`p-3.5 rounded-xl border text-left transition-all ${
                   type === t.id
-                    ? "bg-[#7c6aff]/10 border-[#7c6aff]/40 text-white shadow-[0_0_30px_rgba(124,106,255,0.15)]"
-                    : "bg-[#16161f] border-white/[0.07] text-white/55 hover:text-white hover:border-white/20"
+                    ? "bg-[#f97316]/10 border-[#f97316]/40 text-white shadow-[0_0_30px_rgba(249,115,22,0.15)]"
+                    : "bg-[#17130f] border-white/[0.07] text-white/55 hover:text-white hover:border-white/20"
                 }`}
               >
                 <div className="text-xl mb-1.5">{t.icon}</div>
@@ -88,7 +88,7 @@ export default function ContactPage() {
         {/* Form */}
         <form
           onSubmit={onSubmit}
-          className="bg-[#16161f] border border-white/[0.07] rounded-2xl p-6 sm:p-7 space-y-4"
+          className="bg-[#17130f] border border-white/[0.07] rounded-2xl p-6 sm:p-7 space-y-4"
         >
           <input type="hidden" name="type" value={type} />
 
@@ -133,14 +133,14 @@ export default function ContactPage() {
           )}
 
           {result === "success" ? (
-            <div className="w-full py-4 bg-[#4fd8b8]/10 border border-[#4fd8b8]/20 rounded-xl text-center text-[#4fd8b8] font-medium">
+            <div className="w-full py-4 bg-[#fdba74]/10 border border-[#fdba74]/20 rounded-xl text-center text-[#fdba74] font-medium">
               Message sent! We&apos;ll get back to you soon.
             </div>
           ) : (
             <button
               type="submit"
               disabled={result === "sending"}
-              className="w-full py-3 bg-[#7c6aff] hover:bg-[#6b59ee] disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-medium transition-all shadow-[0_12px_30px_-12px_rgba(124,106,255,0.5)]"
+              className="w-full py-3 bg-[#f97316] hover:bg-[#ea6a0c] disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-medium transition-all shadow-[0_12px_30px_-12px_rgba(249,115,22,0.5)]"
             >
               {result === "sending" ? "Sending..." : "Send message →"}
             </button>
@@ -148,7 +148,7 @@ export default function ContactPage() {
         </form>
 
         <p className="text-center text-xs text-white/30 mt-6">
-          Or DM <a href="https://twitter.com/ensgianteth" target="_blank" rel="noreferrer" className="text-[#7c6aff] hover:text-[#9a8cff]">@ensgianteth</a> on X.
+          Or DM <a href="https://twitter.com/ensgianteth" target="_blank" rel="noreferrer" className="text-[#f97316] hover:text-[#fdba74]">@ensgianteth</a> on X.
         </p>
       </div>
     </div>

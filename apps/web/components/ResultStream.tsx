@@ -35,7 +35,7 @@ function CidResult({ cid }: { cid: string }) {
     <div className="space-y-3">
       <div className="flex items-center gap-2">
         <span className="text-xs text-white/30 font-mono uppercase tracking-wider">IPFS CID</span>
-        <span className="text-xs text-[#4fd8b8] bg-[#4fd8b8]/10 border border-[#4fd8b8]/20 rounded px-1.5 py-0.5">pinned</span>
+        <span className="text-xs text-[#fdba74] bg-[#fdba74]/10 border border-[#fdba74]/20 rounded px-1.5 py-0.5">pinned</span>
       </div>
       <div className="font-mono text-sm text-white/80 bg-black/30 rounded-lg px-4 py-3 break-all border border-white/[0.06]">
         {cid}
@@ -51,7 +51,7 @@ function CidResult({ cid }: { cid: string }) {
           href={`https://ipfs.io/ipfs/${cid}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex-1 py-2 bg-[#4fd8b8]/10 hover:bg-[#4fd8b8]/20 border border-[#4fd8b8]/20 rounded-lg text-xs text-[#4fd8b8] text-center transition-all"
+          className="flex-1 py-2 bg-[#fdba74]/10 hover:bg-[#fdba74]/20 border border-[#fdba74]/20 rounded-lg text-xs text-[#fdba74] text-center transition-all"
         >
           View on IPFS →
         </a>
@@ -87,7 +87,7 @@ export function ResultStream({ result, agent }: ResultStreamProps) {
           href={r.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="block w-full py-2.5 text-center bg-[#7c6aff]/10 hover:bg-[#7c6aff]/20 border border-[#7c6aff]/20 rounded-lg text-sm text-[#7c6aff] transition-all"
+          className="block w-full py-2.5 text-center bg-[#f97316]/10 hover:bg-[#f97316]/20 border border-[#f97316]/20 rounded-lg text-sm text-[#f97316] transition-all"
         >
           View result →
         </a>
@@ -122,7 +122,7 @@ export function ResultStream({ result, agent }: ResultStreamProps) {
 
   return (
     <div className="space-y-4">
-      <div className="bg-[#16161f] border border-white/[0.07] rounded-xl p-4">
+      <div className="bg-[#17130f] border border-white/[0.07] rounded-xl p-4">
         {renderResult()}
       </div>
       <ResultShareBar

@@ -69,7 +69,7 @@ export function AgentShareCard({ manifest }: AgentShareCardProps) {
   };
 
   return (
-    <div className="bg-[#16161f] border border-[#7c6aff]/20 rounded-xl p-5 space-y-4">
+    <div className="bg-[#17130f] border border-[#f97316]/20 rounded-xl p-5 space-y-4">
       <div>
         <h3 className="font-semibold text-white mb-1">Share your agent</h3>
         <p className="text-sm text-white/40">Let the world know you&apos;re live</p>
@@ -77,9 +77,9 @@ export function AgentShareCard({ manifest }: AgentShareCardProps) {
 
       <div className="p-4 bg-black/20 rounded-lg border border-white/[0.05]">
         <div className="font-semibold text-white mb-0.5">{manifest.display_name}</div>
-        <div className="font-mono text-xs text-[#7c6aff]/70 mb-2">{manifest.ens}</div>
+        <div className="font-mono text-xs text-[#f97316]/70 mb-2">{manifest.ens}</div>
         <div className="text-sm text-white/50">{manifest.description}</div>
-        <div className="mt-2 text-[#4fd8b8] font-mono text-sm">
+        <div className="mt-2 text-[#fdba74] font-mono text-sm">
           ${manifest.price_usd.toFixed(2)} per generation
         </div>
       </div>

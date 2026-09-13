@@ -288,7 +288,7 @@ export function RegisterForm({ plan = "trial" }: { plan?: Plan }) {
     }
   };
 
-  const inputClass = "w-full px-4 py-3 bg-[#111118] border border-white/[0.07] rounded-lg text-white placeholder-white/25 focus:outline-none focus:border-[#7c6aff]/50 focus:ring-1 focus:ring-[#7c6aff]/30 transition-all";
+  const inputClass = "w-full px-4 py-3 bg-[#100d0a] border border-white/[0.07] rounded-lg text-white placeholder-white/25 focus:outline-none focus:border-[#f97316]/50 focus:ring-1 focus:ring-[#f97316]/30 transition-all";
 
   // ── Success screen ─────────────────────────────────────────────────────────
   if (successManifest) {
@@ -300,17 +300,17 @@ export function RegisterForm({ plan = "trial" }: { plan?: Plan }) {
           <h2 className="text-xl font-semibold mb-1">You&apos;re live!</h2>
           <p className="text-white/40 text-sm">Free trial active — fully live in search until {expiry}</p>
         </div>
-        <div className="bg-[#16161f] border border-white/[0.07] rounded-xl p-4 space-y-2">
+        <div className="bg-[#17130f] border border-white/[0.07] rounded-xl p-4 space-y-2">
           <div className="text-xs text-white/30">Agent handle</div>
-          <div className="font-mono text-[#7c6aff]">{successManifest.ens}</div>
+          <div className="font-mono text-[#f97316]">{successManifest.ens}</div>
           <div className="text-xs text-white/30 mt-3">IPFS CID</div>
           <div className="font-mono text-xs text-white/50 break-all">{successManifest.ipfs_cid}</div>
         </div>
-        <div className="bg-[#7c6aff]/10 border border-[#7c6aff]/20 rounded-xl p-4 text-sm text-white/60">
+        <div className="bg-[#f97316]/10 border border-[#f97316]/20 rounded-xl p-4 text-sm text-white/60">
           After your trial ends on {expiry}, pay $49 to list permanently. No recurring fees, ever.
           <br /><br />
           Visit{" "}
-          <span className="font-mono text-[#7c6aff]">
+          <span className="font-mono text-[#f97316]">
             sources.eth.limo/agent?ens={successManifest.ens}
           </span>{" "}
           to upgrade anytime.
@@ -325,7 +325,7 @@ export function RegisterForm({ plan = "trial" }: { plan?: Plan }) {
       {/* Progress bar */}
       <div className="flex gap-2 mb-8">
         {[1, 2].map((s) => (
-          <div key={s} className={`h-1 flex-1 rounded-full transition-all ${s <= step ? "bg-[#7c6aff]" : "bg-white/10"}`} />
+          <div key={s} className={`h-1 flex-1 rounded-full transition-all ${s <= step ? "bg-[#f97316]" : "bg-white/10"}`} />
         ))}
       </div>
 
@@ -347,7 +347,7 @@ export function RegisterForm({ plan = "trial" }: { plan?: Plan }) {
                 onClick={() => { setImportMode(mode); setProbeError(""); setImportError(""); }}
                 className={`flex-1 py-2 text-sm rounded-md font-medium transition-all ${
                   importMode === mode
-                    ? "bg-[#7c6aff] text-white"
+                    ? "bg-[#f97316] text-white"
                     : "text-white/40 hover:text-white/70"
                 }`}
               >
@@ -359,11 +359,11 @@ export function RegisterForm({ plan = "trial" }: { plan?: Plan }) {
           {/* OpenAPI import */}
           {importMode === "openapi" && (
             <div className="space-y-3">
-              <div className="bg-[#111118] border border-white/[0.06] rounded-lg px-4 py-3 space-y-1.5 text-xs text-white/40">
+              <div className="bg-[#100d0a] border border-white/[0.06] rounded-lg px-4 py-3 space-y-1.5 text-xs text-white/40">
                 <p className="text-white/60 font-medium mb-1">Your OpenAPI spec needs:</p>
-                <p><span className="font-mono text-[#4fd8b8]">paths.*</span> — every paid route declared</p>
-                <p><span className="font-mono text-[#4fd8b8]">x-payment-info</span> on each paid operation (price + protocols)</p>
-                <p><span className="font-mono text-[#4fd8b8]">x-x402</span> top-level block with <span className="font-mono">payTo</span> + <span className="font-mono">network</span>, OR a live 402 response we can probe</p>
+                <p><span className="font-mono text-[#fdba74]">paths.*</span> — every paid route declared</p>
+                <p><span className="font-mono text-[#fdba74]">x-payment-info</span> on each paid operation (price + protocols)</p>
+                <p><span className="font-mono text-[#fdba74]">x-x402</span> top-level block with <span className="font-mono">payTo</span> + <span className="font-mono">network</span>, OR a live 402 response we can probe</p>
               </div>
               <input
                 value={openApiUrl}
@@ -381,7 +381,7 @@ export function RegisterForm({ plan = "trial" }: { plan?: Plan }) {
               <button
                 onClick={handleImportOpenApi}
                 disabled={!openApiUrl.trim() || probing}
-                className="w-full py-3 bg-[#7c6aff] hover:bg-[#6b59ee] disabled:opacity-40 disabled:cursor-not-allowed rounded-lg font-medium transition-all"
+                className="w-full py-3 bg-[#f97316] hover:bg-[#ea6a0c] disabled:opacity-40 disabled:cursor-not-allowed rounded-lg font-medium transition-all"
               >
                 {probing ? "Reading OpenAPI spec..." : "Discover endpoints →"}
               </button>
@@ -410,7 +410,7 @@ export function RegisterForm({ plan = "trial" }: { plan?: Plan }) {
                   id="erc8004-fetch-btn"
                   onClick={handleFetchErc8004}
                   disabled={!importQuery.trim() || importLoading}
-                  className="px-4 py-3 bg-[#7c6aff] hover:bg-[#6b59ee] disabled:opacity-40 disabled:cursor-not-allowed rounded-lg font-medium text-sm transition-all whitespace-nowrap"
+                  className="px-4 py-3 bg-[#f97316] hover:bg-[#ea6a0c] disabled:opacity-40 disabled:cursor-not-allowed rounded-lg font-medium text-sm transition-all whitespace-nowrap"
                 >
                   {importLoading ? "Fetching..." : "Fetch →"}
                 </button>
@@ -425,7 +425,7 @@ export function RegisterForm({ plan = "trial" }: { plan?: Plan }) {
               {importResults.length > 0 && (
                 <div className="space-y-2">
                   {importResults.map((agent) => (
-                    <div key={`${agent.chain}:${agent.agentId}`} className="bg-[#111118] border border-white/[0.07] rounded-xl p-4">
+                    <div key={`${agent.chain}:${agent.agentId}`} className="bg-[#100d0a] border border-white/[0.07] rounded-xl p-4">
                       <div className="flex items-start gap-3">
                         {agent.image && (
                           // eslint-disable-next-line @next/next/no-img-element
@@ -435,7 +435,7 @@ export function RegisterForm({ plan = "trial" }: { plan?: Plan }) {
                           <div className="flex items-center gap-2 mb-0.5 flex-wrap">
                             <span className="font-semibold text-white/90 text-sm">{agent.name}</span>
                             <span className="font-mono text-[10px] text-white/30 border border-white/[0.08] rounded px-1.5 py-0.5">{agent.chain} #{agent.agentId}</span>
-                            {agent.x402Support && <span className="font-mono text-[10px] text-[#4fd8b8] border border-[#4fd8b8]/20 bg-[#4fd8b8]/10 rounded px-1.5 py-0.5">x402</span>}
+                            {agent.x402Support && <span className="font-mono text-[10px] text-[#fdba74] border border-[#fdba74]/20 bg-[#fdba74]/10 rounded px-1.5 py-0.5">x402</span>}
                           </div>
                           <p className="text-xs text-white/40 line-clamp-2 mb-2">{agent.description}</p>
                           <div className="flex flex-wrap gap-1 mb-3">
@@ -451,7 +451,7 @@ export function RegisterForm({ plan = "trial" }: { plan?: Plan }) {
                       <button
                         onClick={() => handleUseErc8004Agent(agent)}
                         disabled={probing || agent.services.filter(s => s.endpoint?.startsWith("https://")).length === 0}
-                        className="w-full py-2 bg-[#7c6aff] hover:bg-[#6b59ee] disabled:opacity-40 disabled:cursor-not-allowed rounded-lg text-sm font-medium transition-all"
+                        className="w-full py-2 bg-[#f97316] hover:bg-[#ea6a0c] disabled:opacity-40 disabled:cursor-not-allowed rounded-lg text-sm font-medium transition-all"
                       >
                         {probing ? "Probing endpoint..." : "Use this agent →"}
                       </button>
@@ -471,11 +471,11 @@ export function RegisterForm({ plan = "trial" }: { plan?: Plan }) {
           {/* JSON paste */}
           {importMode === "json" && (
             <div className="space-y-3">
-              <div className="bg-[#111118] border border-white/[0.06] rounded-lg px-4 py-3 space-y-1.5 text-xs text-white/40">
+              <div className="bg-[#100d0a] border border-white/[0.06] rounded-lg px-4 py-3 space-y-1.5 text-xs text-white/40">
                 <p className="text-white/60 font-medium mb-1">For best results, include on each service:</p>
-                <p><span className="font-mono text-[#4fd8b8]">&quot;name&quot;</span> — standard ERC-8004 types: <span className="font-mono text-white/50">web</span>, <span className="font-mono text-white/50">MCP</span>, <span className="font-mono text-white/50">A2A</span>, <span className="font-mono text-white/50">OASF</span></p>
-                <p><span className="font-mono text-[#4fd8b8]">&quot;endpoint&quot;</span> — full <span className="font-mono">https://</span> URL</p>
-                <p><span className="font-mono text-[#4fd8b8]">&quot;input_type&quot;</span> — <span className="font-mono">&quot;text&quot;</span>, <span className="font-mono">&quot;file&quot;</span>, or <span className="font-mono">&quot;json&quot;</span></p>
+                <p><span className="font-mono text-[#fdba74]">&quot;name&quot;</span> — standard ERC-8004 types: <span className="font-mono text-white/50">web</span>, <span className="font-mono text-white/50">MCP</span>, <span className="font-mono text-white/50">A2A</span>, <span className="font-mono text-white/50">OASF</span></p>
+                <p><span className="font-mono text-[#fdba74]">&quot;endpoint&quot;</span> — full <span className="font-mono">https://</span> URL</p>
+                <p><span className="font-mono text-[#fdba74]">&quot;input_type&quot;</span> — <span className="font-mono">&quot;text&quot;</span>, <span className="font-mono">&quot;file&quot;</span>, or <span className="font-mono">&quot;json&quot;</span></p>
               </div>
               <textarea
                 value={rawJson}
@@ -493,7 +493,7 @@ export function RegisterForm({ plan = "trial" }: { plan?: Plan }) {
               <button
                 onClick={handleImportJson}
                 disabled={!rawJson.trim() || probing}
-                className="w-full py-3 bg-[#7c6aff] hover:bg-[#6b59ee] disabled:opacity-40 disabled:cursor-not-allowed rounded-lg font-medium transition-all"
+                className="w-full py-3 bg-[#f97316] hover:bg-[#ea6a0c] disabled:opacity-40 disabled:cursor-not-allowed rounded-lg font-medium transition-all"
               >
                 {probing ? "Probing your agent..." : "Import & probe →"}
               </button>
@@ -513,7 +513,7 @@ export function RegisterForm({ plan = "trial" }: { plan?: Plan }) {
             <p className="text-sm text-white/40 mb-4">Fetched from your agent. Edit anything before going live.</p>
           </div>
 
-          <div className="bg-[#111118] border border-white/[0.07] rounded-xl p-4 space-y-3 text-sm">
+          <div className="bg-[#100d0a] border border-white/[0.07] rounded-xl p-4 space-y-3 text-sm">
             <div className="flex items-center gap-3">
               {parsed.favicon_url && (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -524,7 +524,7 @@ export function RegisterForm({ plan = "trial" }: { plan?: Plan }) {
                 <input
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
-                  className="bg-transparent text-white font-medium w-full focus:outline-none border-b border-white/10 focus:border-[#7c6aff]/50 pb-0.5 transition-colors"
+                  className="bg-transparent text-white font-medium w-full focus:outline-none border-b border-white/10 focus:border-[#f97316]/50 pb-0.5 transition-colors"
                 />
               </div>
             </div>
@@ -537,7 +537,7 @@ export function RegisterForm({ plan = "trial" }: { plan?: Plan }) {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <div className="text-xs text-white/30 mb-0.5">Handle</div>
-                <div className="font-mono text-xs text-[#7c6aff] truncate">
+                <div className="font-mono text-xs text-[#f97316] truncate">
                   {slugify(displayName || parsed.slug)}.agents.sources.eth
                 </div>
               </div>
@@ -555,12 +555,12 @@ export function RegisterForm({ plan = "trial" }: { plan?: Plan }) {
                   {parsed.probe.services.map((s) => (
                     <div key={s.name} className="flex justify-between text-xs">
                       <span className="font-mono text-white/40">{s.name}</span>
-                      <span className="text-[#4fd8b8]">${s.priceUsd.toFixed(4)} USDC</span>
+                      <span className="text-[#fdba74]">${s.priceUsd.toFixed(4)} USDC</span>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="text-xs font-mono text-[#4fd8b8]">${parsed.probe.priceUsd.toFixed(4)} USDC per request</div>
+                <div className="text-xs font-mono text-[#fdba74]">${parsed.probe.priceUsd.toFixed(4)} USDC per request</div>
               )}
             </div>
 
@@ -575,7 +575,7 @@ export function RegisterForm({ plan = "trial" }: { plan?: Plan }) {
             </div>
 
             <div className="flex items-center gap-2 text-xs">
-              <div className={`w-2 h-2 rounded-full ${parsed.probe.healthy ? "bg-[#4fd8b8]" : "bg-yellow-400"}`} />
+              <div className={`w-2 h-2 rounded-full ${parsed.probe.healthy ? "bg-[#fdba74]" : "bg-yellow-400"}`} />
               <span className="text-white/30">
                 {parsed.probe.healthy ? "Health check passed" : "Health endpoint not found (optional)"}
               </span>
@@ -597,8 +597,8 @@ export function RegisterForm({ plan = "trial" }: { plan?: Plan }) {
           </div>
 
           {plan === "trial" && (
-            <div className="bg-[#4fd8b8]/10 border border-[#4fd8b8]/20 rounded-xl p-4 space-y-1">
-              <div className="text-sm font-medium text-[#4fd8b8]">Free 15-day trial</div>
+            <div className="bg-[#fdba74]/10 border border-[#fdba74]/20 rounded-xl p-4 space-y-1">
+              <div className="text-sm font-medium text-[#fdba74]">Free 15-day trial</div>
               <ul className="text-xs text-white/50 space-y-0.5">
                 <li>✓ Fully live in search from day one</li>
                 <li>✓ Real traffic, real payments to your wallet</li>
@@ -609,8 +609,8 @@ export function RegisterForm({ plan = "trial" }: { plan?: Plan }) {
           )}
 
           {plan === "permanent" && (
-            <div className="bg-[#7c6aff]/10 border border-[#7c6aff]/20 rounded-xl p-4 space-y-1">
-              <div className="text-sm font-medium text-[#a598ff]">Permanent listing — $49 USDC</div>
+            <div className="bg-[#f97316]/10 border border-[#f97316]/20 rounded-xl p-4 space-y-1">
+              <div className="text-sm font-medium text-[#fdba74]">Permanent listing — $49 USDC</div>
               <ul className="text-xs text-white/50 space-y-0.5">
                 <li>✓ Listed permanently, no recurring fees</li>
                 <li>✓ 100% of generation fees go to your wallet</li>
@@ -629,7 +629,7 @@ export function RegisterForm({ plan = "trial" }: { plan?: Plan }) {
             <button
               onClick={handlePublish}
               disabled={loading || !category}
-              className="flex-1 py-3 bg-[#7c6aff] hover:bg-[#6b59ee] disabled:opacity-40 disabled:cursor-not-allowed rounded-lg font-medium transition-all"
+              className="flex-1 py-3 bg-[#f97316] hover:bg-[#ea6a0c] disabled:opacity-40 disabled:cursor-not-allowed rounded-lg font-medium transition-all"
             >
               {loading
                 ? "Publishing..."

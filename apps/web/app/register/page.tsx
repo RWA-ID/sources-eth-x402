@@ -17,7 +17,7 @@ function Eyebrow({ children, accent }: { children: React.ReactNode; accent?: boo
   return (
     <div
       className={`font-mono text-[11px] tracking-[0.2em] uppercase ${
-        accent ? "text-[#7c6aff]" : "text-white/40"
+        accent ? "text-[#f97316]" : "text-white/40"
       }`}
     >
       {children}
@@ -53,13 +53,13 @@ function SectionHeader({
 
 function Tok({ c, children }: { c: "key" | "str" | "num" | "brace" | "prompt" | "cmd" | "ok" | "dim"; children: React.ReactNode }) {
   const map: Record<string, string> = {
-    key: "text-[#7c6aff]",
-    str: "text-[#4fd8b8]",
+    key: "text-[#f97316]",
+    str: "text-[#fdba74]",
     num: "text-[#f5b549]",
     brace: "text-white/55",
-    prompt: "text-[#7c6aff] font-semibold",
+    prompt: "text-[#f97316] font-semibold",
     cmd: "text-white",
-    ok: "text-[#4fd8b8]",
+    ok: "text-[#fdba74]",
     dim: "text-white/35",
   };
   return <span className={map[c]}>{children}</span>;
@@ -67,7 +67,7 @@ function Tok({ c, children }: { c: "key" | "str" | "num" | "brace" | "prompt" | 
 
 function BuildersTerminal() {
   return (
-    <div className="bg-[#16161f] border border-white/[0.14] rounded-2xl overflow-hidden shadow-[0_40px_80px_-40px_rgba(0,0,0,0.6)]">
+    <div className="bg-[#17130f] border border-white/[0.14] rounded-2xl overflow-hidden shadow-[0_40px_80px_-40px_rgba(0,0,0,0.6)]">
       <div className="flex items-center gap-2 px-4 py-3 border-b border-white/[0.07] bg-white/[0.02]">
         <span className="w-2.5 h-2.5 rounded-full bg-[#ff5f57]" />
         <span className="w-2.5 h-2.5 rounded-full bg-[#febc2e]" />
@@ -103,7 +103,7 @@ export default function RegisterPage() {
 
   const planCardCls = (plan: Plan, base: string) =>
     selectedPlan === plan
-      ? `${base} border-[#7c6aff]/60 ring-2 ring-[#7c6aff]/40 shadow-[0_0_30px_rgba(124,106,255,0.2)]`
+      ? `${base} border-[#f97316]/60 ring-2 ring-[#f97316]/40 shadow-[0_0_30px_rgba(249,115,22,0.2)]`
       : base;
 
   return (
@@ -115,7 +115,7 @@ export default function RegisterPage() {
             <Eyebrow accent>for builders</Eyebrow>
             <h1 className="mt-4 text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight leading-[1.02]">
               List your agent in 5 minutes.<br />
-              <span className="text-[#7c6aff] italic font-medium">Keep 100% of revenue.</span>
+              <span className="text-[#f97316] font-medium">Keep 100% of revenue.</span>
             </h1>
             <p className="mt-5 max-w-md text-base text-white/55 leading-relaxed">
               Point us at a single HTTPS endpoint. We handle x402 payment gating, USDC settlement on Base, and the QR flow. You stay non-custodial.
@@ -124,7 +124,7 @@ export default function RegisterPage() {
             <ul className="list-none p-0 mt-8 flex flex-col gap-3.5">
               {BULLETS.map((b) => (
                 <li key={b.t} className="flex gap-3.5">
-                  <div className="shrink-0 w-[22px] h-[22px] rounded-md bg-[#7c6aff]/15 border border-[#7c6aff]/30 grid place-items-center text-[#7c6aff] mt-0.5">
+                  <div className="shrink-0 w-[22px] h-[22px] rounded-md bg-[#f97316]/15 border border-[#f97316]/30 grid place-items-center text-[#f97316] mt-0.5">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="m5 12 4 4L19 6" /></svg>
                   </div>
                   <div>
@@ -138,7 +138,7 @@ export default function RegisterPage() {
             <div className="mt-9 flex gap-3 flex-wrap">
               <button
                 onClick={() => selectPlan("permanent")}
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-lg bg-[#7c6aff] hover:bg-[#6b59ee] text-white text-[15px] font-medium shadow-[0_12px_30px_-12px_rgba(124,106,255,0.5)] transition-colors"
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-lg bg-[#f97316] hover:bg-[#ea6a0c] text-white text-[15px] font-medium shadow-[0_12px_30px_-12px_rgba(249,115,22,0.5)] transition-colors"
               >
                 Register your agent →
               </button>
@@ -161,7 +161,7 @@ export default function RegisterPage() {
       <section className="max-w-5xl mx-auto mt-24">
         <SectionHeader
           eyebrow="choose your plan"
-          title={<>Free to start. <span className="text-[#7c6aff] italic font-medium">$49 to stay forever.</span></>}
+          title={<>Free to start. <span className="text-[#f97316] font-medium">$49 to stay forever.</span></>}
           subtitle="Pay in USDC on Base. No account or wallet connection required to pay."
         />
 
@@ -172,19 +172,19 @@ export default function RegisterPage() {
             onClick={() => selectPlan("trial")}
             className={planCardCls(
               "trial",
-              "text-left bg-[#16161f] border border-white/[0.07] hover:border-white/20 rounded-2xl p-6 flex flex-col transition-all cursor-pointer"
+              "text-left bg-[#17130f] border border-white/[0.07] hover:border-white/20 rounded-2xl p-6 flex flex-col transition-all cursor-pointer"
             )}
           >
             <div className="text-xs font-mono text-white/40 tracking-wider uppercase mb-2">Trial</div>
             <div className="text-4xl font-semibold mb-1">Free</div>
             <div className="text-white/30 text-sm mb-6">15 days, no card</div>
             <ul className="space-y-2.5 text-sm text-white/65 mb-6 mt-auto">
-              <li className="flex items-start gap-2"><span className="text-[#4fd8b8] mt-0.5">✓</span> Real traffic from day one</li>
-              <li className="flex items-start gap-2"><span className="text-[#4fd8b8] mt-0.5">✓</span> Unique agent handle</li>
-              <li className="flex items-start gap-2"><span className="text-[#4fd8b8] mt-0.5">✓</span> IPFS manifest pinned</li>
-              <li className="flex items-start gap-2"><span className="text-[#4fd8b8] mt-0.5">✓</span> Full x402 infrastructure</li>
+              <li className="flex items-start gap-2"><span className="text-[#fdba74] mt-0.5">✓</span> Real traffic from day one</li>
+              <li className="flex items-start gap-2"><span className="text-[#fdba74] mt-0.5">✓</span> Unique agent handle</li>
+              <li className="flex items-start gap-2"><span className="text-[#fdba74] mt-0.5">✓</span> IPFS manifest pinned</li>
+              <li className="flex items-start gap-2"><span className="text-[#fdba74] mt-0.5">✓</span> Full x402 infrastructure</li>
             </ul>
-            <div className={`w-full py-2.5 rounded-lg text-sm font-medium text-center border transition-all ${selectedPlan === "trial" ? "bg-[#7c6aff] border-[#7c6aff] text-white" : "bg-white/[0.04] border-white/[0.07] text-white/70"}`}>
+            <div className={`w-full py-2.5 rounded-lg text-sm font-medium text-center border transition-all ${selectedPlan === "trial" ? "bg-[#f97316] border-[#f97316] text-white" : "bg-white/[0.04] border-white/[0.07] text-white/70"}`}>
               {selectedPlan === "trial" ? "Selected ✓" : "Start free trial"}
             </div>
           </button>
@@ -195,28 +195,28 @@ export default function RegisterPage() {
             onClick={() => selectPlan("permanent")}
             className={planCardCls(
               "permanent",
-              "text-left relative bg-gradient-to-b from-[#7c6aff]/[0.06] to-[#16161f] border border-[#7c6aff]/30 rounded-2xl p-6 flex flex-col transition-all cursor-pointer shadow-[0_30px_80px_-40px_rgba(124,106,255,0.4)]"
+              "text-left relative bg-gradient-to-b from-[#f97316]/[0.06] to-[#17130f] border border-[#f97316]/30 rounded-2xl p-6 flex flex-col transition-all cursor-pointer shadow-[0_30px_80px_-40px_rgba(249,115,22,0.4)]"
             )}
           >
             {selectedPlan !== "permanent" && (
-              <div className="absolute top-4 right-4 px-2 py-0.5 bg-[#7c6aff] rounded text-[11px] font-medium">Most popular</div>
+              <div className="absolute top-4 right-4 px-2 py-0.5 bg-[#f97316] rounded text-[11px] font-medium">Most popular</div>
             )}
-            <div className="text-xs font-mono text-[#7c6aff] tracking-wider uppercase mb-2">Permanent</div>
+            <div className="text-xs font-mono text-[#f97316] tracking-wider uppercase mb-2">Permanent</div>
             <div className="text-4xl font-semibold mb-1">$49</div>
             <div className="text-white/30 text-sm mb-6">One-time, forever</div>
             <ul className="space-y-2.5 text-sm text-white/65 mb-6 mt-auto">
-              <li className="flex items-start gap-2"><span className="text-[#4fd8b8] mt-0.5">✓</span> Everything in trial</li>
-              <li className="flex items-start gap-2"><span className="text-[#4fd8b8] mt-0.5">✓</span> Listed permanently</li>
-              <li className="flex items-start gap-2"><span className="text-[#4fd8b8] mt-0.5">✓</span> 100% of fees to you</li>
-              <li className="flex items-start gap-2"><span className="text-[#4fd8b8] mt-0.5">✓</span> Priority for featured</li>
+              <li className="flex items-start gap-2"><span className="text-[#fdba74] mt-0.5">✓</span> Everything in trial</li>
+              <li className="flex items-start gap-2"><span className="text-[#fdba74] mt-0.5">✓</span> Listed permanently</li>
+              <li className="flex items-start gap-2"><span className="text-[#fdba74] mt-0.5">✓</span> 100% of fees to you</li>
+              <li className="flex items-start gap-2"><span className="text-[#fdba74] mt-0.5">✓</span> Priority for featured</li>
             </ul>
-            <div className={`w-full py-2.5 rounded-lg text-sm font-medium text-center transition-all ${selectedPlan === "permanent" ? "bg-[#7c6aff] text-white" : "bg-[#7c6aff] hover:bg-[#6b59ee] text-white"}`}>
+            <div className={`w-full py-2.5 rounded-lg text-sm font-medium text-center transition-all ${selectedPlan === "permanent" ? "bg-[#f97316] text-white" : "bg-[#f97316] hover:bg-[#ea6a0c] text-white"}`}>
               {selectedPlan === "permanent" ? "Selected ✓" : "Register permanently"}
             </div>
           </button>
 
           {/* Developer API */}
-          <div className="bg-[#16161f] border border-white/[0.05] rounded-2xl p-6 relative flex flex-col opacity-60">
+          <div className="bg-[#17130f] border border-white/[0.05] rounded-2xl p-6 relative flex flex-col opacity-60">
             <div className="absolute top-4 right-4 px-2 py-0.5 bg-white/[0.06] border border-white/[0.08] rounded text-[11px] text-white/40 font-medium">Coming Soon</div>
             <div className="text-xs font-mono text-white/30 tracking-wider uppercase mb-2">Developer API</div>
             <div className="flex items-end gap-1 mb-1">
@@ -241,7 +241,7 @@ export default function RegisterPage() {
       <section className="max-w-5xl mx-auto mt-24">
         <SectionHeader
           eyebrow="why paid"
-          title={<>A small fee keeps the marketplace <span className="text-[#7c6aff] italic font-medium">honest.</span></>}
+          title={<>A small fee keeps the marketplace <span className="text-[#f97316] font-medium">honest.</span></>}
         />
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 mt-10">
           {[
@@ -249,7 +249,7 @@ export default function RegisterPage() {
             { i: "🔍", t: "Trustworthy results", d: "Users trust that agents here are maintained and legitimate — not abandoned." },
             { i: "📈", t: "Platform growth", d: "Listing fees fund marketing, infra, and dev — bringing more paid requests to you." },
           ].map((b) => (
-            <div key={b.t} className="bg-[#16161f] border border-white/[0.07] rounded-2xl p-6">
+            <div key={b.t} className="bg-[#17130f] border border-white/[0.07] rounded-2xl p-6">
               <div className="text-xl mb-3">{b.i}</div>
               <div className="text-base font-medium text-white mb-1.5">{b.t}</div>
               <div className="text-sm text-white/45 leading-relaxed">{b.d}</div>
@@ -262,11 +262,11 @@ export default function RegisterPage() {
       <section id="register-form" className="max-w-lg mx-auto mt-24 scroll-mt-8">
         <SectionHeader
           eyebrow="register"
-          title={<>Ship your agent <span className="text-[#7c6aff] italic font-medium">now.</span></>}
+          title={<>Ship your agent <span className="text-[#f97316] font-medium">now.</span></>}
         />
         <div className="mt-10">
           {selectedPlan && (
-            <div className="mb-6 px-4 py-3 bg-[#7c6aff]/10 border border-[#7c6aff]/30 rounded-xl text-sm text-[#a598ff] flex items-center justify-between">
+            <div className="mb-6 px-4 py-3 bg-[#f97316]/10 border border-[#f97316]/30 rounded-xl text-sm text-[#fdba74] flex items-center justify-between">
               <span>
                 Plan: <span className="font-medium text-white">{selectedPlan === "trial" ? "Free Trial" : "Permanent ($49)"}</span>
               </span>

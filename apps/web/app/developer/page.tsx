@@ -109,7 +109,7 @@ export default function DeveloperPage() {
     <div className="px-4 py-16 max-w-3xl mx-auto">
       {/* Header */}
       <div className="mb-12">
-        <div className="inline-block px-3 py-1 bg-[#7c6aff]/10 border border-[#7c6aff]/20 rounded-full text-xs text-[#7c6aff] mb-4">
+        <div className="inline-block px-3 py-1 bg-[#f97316]/10 border border-[#f97316]/20 rounded-full text-xs text-[#f97316] mb-4">
           Developer API
         </div>
         <h1 className="text-3xl font-bold mb-3">x402 Proxy API</h1>
@@ -126,8 +126,8 @@ export default function DeveloperPage() {
           { step: "2", title: "Call any endpoint", body: "Pass any HTTPS POST endpoint in your request." },
           { step: "3", title: "We handle x402", body: "Payment verification, replay protection, forwarding." },
         ].map(({ step, title, body }) => (
-          <div key={step} className="bg-[#16161f] border border-white/[0.07] rounded-xl p-4">
-            <div className="w-6 h-6 rounded-full bg-[#7c6aff]/20 text-[#7c6aff] text-xs font-bold flex items-center justify-center mb-3">
+          <div key={step} className="bg-[#17130f] border border-white/[0.07] rounded-xl p-4">
+            <div className="w-6 h-6 rounded-full bg-[#f97316]/20 text-[#f97316] text-xs font-bold flex items-center justify-center mb-3">
               {step}
             </div>
             <div className="font-medium mb-1">{title}</div>
@@ -175,8 +175,8 @@ export default function DeveloperPage() {
             desc: "Purchase and generate a new API key",
           },
         ].map(({ method, path, auth, desc }) => (
-          <div key={path} className="flex items-start gap-4 bg-[#16161f] border border-white/[0.07] rounded-xl px-4 py-3">
-            <span className={`text-xs font-mono font-bold mt-0.5 flex-shrink-0 ${method === "GET" ? "text-[#4fd8b8]" : "text-[#7c6aff]"}`}>
+          <div key={path} className="flex items-start gap-4 bg-[#17130f] border border-white/[0.07] rounded-xl px-4 py-3">
+            <span className={`text-xs font-mono font-bold mt-0.5 flex-shrink-0 ${method === "GET" ? "text-[#fdba74]" : "text-[#f97316]"}`}>
               {method}
             </span>
             <div className="flex-1 min-w-0">
@@ -189,7 +189,7 @@ export default function DeveloperPage() {
       </div>
 
       {/* Get API key */}
-      <div className="bg-[#16161f] border border-[#7c6aff]/20 rounded-2xl p-6 shadow-[0_0_30px_rgba(124,106,255,0.08)]">
+      <div className="bg-[#17130f] border border-[#f97316]/20 rounded-2xl p-6 shadow-[0_0_30px_rgba(249,115,22,0.08)]">
         <h2 className="text-lg font-semibold mb-1">Get your API key</h2>
         <p className="text-white/35 text-sm mb-5">
           $99 USDC / year · Unlimited requests · Cancel anytime
@@ -197,13 +197,13 @@ export default function DeveloperPage() {
 
         {apiKey ? (
           <div className="space-y-3">
-            <div className="px-4 py-3 bg-[#111118] border border-[#4fd8b8]/20 rounded-lg">
+            <div className="px-4 py-3 bg-[#100d0a] border border-[#fdba74]/20 rounded-lg">
               <div className="text-xs text-white/30 mb-1">Your API key — save this, it won&apos;t be shown again</div>
-              <div className="font-mono text-sm text-[#4fd8b8] break-all">{apiKey}</div>
+              <div className="font-mono text-sm text-[#fdba74] break-all">{apiKey}</div>
             </div>
             <button
               onClick={() => handleCopy(apiKey)}
-              className="w-full py-2.5 bg-[#4fd8b8]/10 hover:bg-[#4fd8b8]/20 border border-[#4fd8b8]/20 rounded-lg text-sm text-[#4fd8b8] transition-all"
+              className="w-full py-2.5 bg-[#fdba74]/10 hover:bg-[#fdba74]/20 border border-[#fdba74]/20 rounded-lg text-sm text-[#fdba74] transition-all"
             >
               {copied ? "Copied!" : "Copy API key"}
             </button>
@@ -217,14 +217,14 @@ export default function DeveloperPage() {
                 value={label}
                 onChange={(e) => setLabel(e.target.value)}
                 placeholder="My project"
-                className="w-full px-4 py-3 bg-[#111118] border border-white/[0.07] rounded-lg text-white placeholder-white/25 focus:outline-none focus:border-[#7c6aff]/50 focus:ring-1 focus:ring-[#7c6aff]/30 transition-all"
+                className="w-full px-4 py-3 bg-[#100d0a] border border-white/[0.07] rounded-lg text-white placeholder-white/25 focus:outline-none focus:border-[#f97316]/50 focus:ring-1 focus:ring-[#f97316]/30 transition-all"
               />
             </div>
             {error && <p className="text-red-400 text-sm">{error}</p>}
             <button
               onClick={handleGetKey}
               disabled={loading}
-              className="w-full py-3 bg-[#7c6aff] hover:bg-[#6b59ee] disabled:opacity-40 disabled:cursor-not-allowed rounded-xl font-medium transition-all"
+              className="w-full py-3 bg-[#f97316] hover:bg-[#ea6a0c] disabled:opacity-40 disabled:cursor-not-allowed rounded-xl font-medium transition-all"
             >
               {loading ? "Generating..." : "Pay $99 & get API key"}
             </button>

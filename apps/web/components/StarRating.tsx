@@ -52,7 +52,7 @@ export function StarRating({ avg, count, interactive = false, onRate, size = "sm
         <span className="text-xs text-white/20">No ratings</span>
       )}
       {submitted && (
-        <span className="text-xs text-[#4fd8b8]">Thanks!</span>
+        <span className="text-xs text-[#fdba74]">Thanks!</span>
       )}
     </div>
   );

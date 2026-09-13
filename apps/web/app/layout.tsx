@@ -30,56 +30,58 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-[#0a0a0f] text-white font-display antialiased relative overflow-x-hidden">
+      {/* Body is Instrument Sans; Space Grotesk is display-only and is applied
+          by globals.css to h1/h2 and anything tagged .font-display. */}
+      <body className="min-h-screen bg-[#0b0907] text-[#eef0f6] font-sans antialiased relative overflow-x-hidden">
         {/* Atmosphere — radial gradient backdrop */}
         <div
           className="fixed inset-0 z-0 pointer-events-none"
           style={{
             background:
-              "radial-gradient(ellipse 60% 50% at 50% 0%, rgba(124, 106, 255, 0.18), transparent 60%), radial-gradient(ellipse 40% 30% at 80% 30%, rgba(79, 216, 184, 0.06), transparent 60%)",
+              "radial-gradient(ellipse 70% 45% at 50% -5%, var(--glow), transparent 65%), radial-gradient(ellipse 40% 30% at 85% 25%, color-mix(in oklab, var(--a2) 9%, transparent), transparent 60%)",
           }}
         />
         {/* Grain texture */}
         <div
-          className="fixed inset-0 z-0 pointer-events-none opacity-40 mix-blend-overlay"
+          className="fixed inset-0 z-0 pointer-events-none opacity-50 mix-blend-overlay"
           style={{
-            backgroundImage: "radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px)",
+            backgroundImage: "radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px)",
             backgroundSize: "3px 3px",
           }}
         />
 
-        <nav className="sticky top-0 z-30 border-b border-white/[0.07] px-6 py-4 flex items-center justify-between bg-[#0a0a0f]/72 backdrop-blur-xl">
-          <a href="/" className="flex items-center gap-2.5">
+        <nav
+          className="sticky top-0 z-30 border-b border-white/[0.08] px-6 py-3.5 flex items-center justify-between backdrop-blur-[18px]"
+          style={{ background: "color-mix(in oklab, var(--bg) 74%, transparent)" }}
+        >
+          <a href="/" className="flex items-center gap-2.5 shrink-0">
             <div
-              className="w-[22px] h-[22px] rounded-md bg-[#7c6aff] grid place-items-center"
-              style={{ boxShadow: "0 0 0 4px rgba(124,106,255,0.14)" }}
+              className="w-[22px] h-[22px] rounded-[7px] bg-[#f97316] grid place-items-center"
+              style={{ boxShadow: "0 0 0 4px color-mix(in oklab, var(--a) 16%, transparent)" }}
             >
-              <div className="w-2 h-2 rounded-sm bg-[#0a0a0f]" />
+              <div className="w-2 h-2 rounded-[2px] bg-[#0b0907]" />
             </div>
-            <span className="font-mono text-sm font-medium tracking-tight">
-              sources<span className="text-[#7c6aff]">.eth</span>
+            <span className="font-mono text-sm font-medium tracking-[-0.02em] whitespace-nowrap">
+              sources<span className="text-[#f97316]">.eth</span>
             </span>
           </a>
-          <div className="hidden md:flex items-center gap-1 text-sm text-white/55">
-            <a href="/#how" className="px-3 py-2 rounded-lg hover:text-white transition-colors">How it works</a>
-            <a href="/register" className="px-3 py-2 rounded-lg hover:text-white transition-colors">For builders</a>
-            <a href="/#agents" className="px-3 py-2 rounded-lg hover:text-white transition-colors">Browse agents</a>
-            <a href="/#faq" className="px-3 py-2 rounded-lg hover:text-white transition-colors">FAQ</a>
+          <div className="hidden md:flex items-center gap-1 text-sm text-[#eef0f6]/[0.58]">
+            <a href="/" className="px-3 py-2 rounded-[9px] whitespace-nowrap hover:text-white hover:bg-white/[0.05] transition-colors">Home</a>
+            <a href="/register" className="px-3 py-2 rounded-[9px] whitespace-nowrap hover:text-white hover:bg-white/[0.05] transition-colors">For builders</a>
+            <a href="/developer" className="px-3 py-2 rounded-[9px] whitespace-nowrap hover:text-white hover:bg-white/[0.05] transition-colors">Developer API</a>
+            <a href="/demo" className="px-3 py-2 rounded-[9px] whitespace-nowrap hover:text-white hover:bg-white/[0.05] transition-colors">Demo</a>
+            <a href="/contact" className="px-3 py-2 rounded-[9px] whitespace-nowrap hover:text-white hover:bg-white/[0.05] transition-colors">Contact</a>
           </div>
-          <div className="flex items-center gap-2">
-            <a
-              href="/contact"
-              className="hidden sm:inline-block text-sm px-3 py-2 rounded-lg text-white/60 hover:text-white transition-colors"
-            >
-              Contact
-            </a>
-            <a
-              href="/register"
-              className="text-sm px-3.5 py-2 rounded-lg bg-[#7c6aff]/14 hover:bg-[#7c6aff]/22 border border-[#7c6aff]/40 hover:border-[#7c6aff]/60 text-white font-medium transition-all"
-            >
-              List your agent →
-            </a>
-          </div>
+          <a
+            href="/register"
+            className="text-sm px-3.5 py-2.5 rounded-[10px] border text-white font-medium transition-all whitespace-nowrap shrink-0"
+            style={{
+              background: "color-mix(in oklab, var(--a) 16%, transparent)",
+              borderColor: "color-mix(in oklab, var(--a) 45%, transparent)",
+            }}
+          >
+            List your agent →
+          </a>
         </nav>
 
         <main className="relative z-10">
@@ -91,28 +93,17 @@ export default function RootLayout({
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-10 pb-9 border-b border-white/[0.07]">
               <div className="col-span-2 md:col-span-2">
                 <div className="flex items-center gap-2.5 mb-3.5">
-                  <div className="w-[22px] h-[22px] rounded-md bg-[#7c6aff] grid place-items-center">
-                    <div className="w-2 h-2 rounded-sm bg-[#0a0a0f]" />
+                  <div className="w-[22px] h-[22px] rounded-md bg-[#f97316] grid place-items-center">
+                    <div className="w-2 h-2 rounded-sm bg-[#0b0907]" />
                   </div>
                   <span className="font-mono text-sm font-medium">
-                    sources<span className="text-[#7c6aff]">.eth</span>
+                    sources<span className="text-[#f97316]">.eth</span>
                   </span>
                 </div>
                 <p className="m-0 text-sm text-white/55 leading-relaxed max-w-xs">
                   Pay AI agents like you pay for coffee. A consumer marketplace for the x402 protocol.
                 </p>
                 <div className="mt-5 flex gap-2">
-                  <a
-                    href="https://x.com/penniesai?s=21"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="X"
-                    className="grid place-items-center w-9 h-9 rounded-lg bg-white/[0.04] border border-white/[0.07] text-white/55 hover:text-white hover:border-white/20 transition-all"
-                  >
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                    </svg>
-                  </a>
                   <a
                     href="https://github.com/RWA-ID/sources-eth-x402"
                     target="_blank"
@@ -160,11 +151,20 @@ export default function RootLayout({
                   </a>
                 </div>
               </div>
+
+              <div>
+                <div className="font-mono text-[11px] text-white/40 uppercase tracking-wider mb-3">Legal</div>
+                <div className="flex flex-col gap-1.5">
+                  <a href="/privacy" className="text-sm text-white/55 hover:text-white transition-colors py-1">Privacy</a>
+                  <a href="/terms" className="text-sm text-white/55 hover:text-white transition-colors py-1">Terms</a>
+                  <a href="/disclaimer" className="text-sm text-white/55 hover:text-white transition-colors py-1">Disclaimer</a>
+                </div>
+              </div>
             </div>
 
             <div className="flex flex-wrap items-center justify-between gap-3.5 pt-6">
               <div className="font-mono text-xs text-white/35">
-                Built by <a href="https://x.com/ensgianteth" target="_blank" rel="noopener noreferrer" className="text-[#7c6aff] hover:text-[#9a8cff]">@ensgianteth</a> · on Base · on IPFS · open source
+                Built by <span className="text-[#f97316]">@ensgianteth</span> · on Base · on IPFS · open source
               </div>
               <div className="text-xs text-white/35">USDC payments. USD-priced. Non-custodial.</div>
             </div>

@@ -268,7 +268,7 @@ export function InlineAgentPanel({ agent, onClose }: InlineAgentPanelProps) {
     : !!file;
 
   return (
-    <div className="mt-2 bg-[#16161f] border border-[#7c6aff]/30 rounded-xl shadow-[0_0_40px_rgba(124,106,255,0.1)] overflow-hidden">
+    <div className="mt-2 bg-[#17130f] border border-[#f97316]/30 rounded-xl shadow-[0_0_40px_rgba(249,115,22,0.1)] overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-3 border-b border-white/[0.06]">
         <div className="flex items-center gap-2.5">
@@ -277,7 +277,7 @@ export function InlineAgentPanel({ agent, onClose }: InlineAgentPanelProps) {
             <img src={agent.favicon_url} alt="" className="w-7 h-7 rounded-md object-cover" />
           ) : null}
           <span className="font-semibold text-sm">{agent.display_name}</span>
-          <span className="font-mono text-xs text-[#4fd8b8]">${servicePrice.toFixed(2)}</span>
+          <span className="font-mono text-xs text-[#fdba74]">${servicePrice.toFixed(2)}</span>
           {rating && <StarRating avg={rating.avg} count={rating.count} size="sm" />}
         </div>
         <button
@@ -313,13 +313,13 @@ export function InlineAgentPanel({ agent, onClose }: InlineAgentPanelProps) {
                   onClick={() => { setSelectedService(svc); handleReset(); }}
                   className={`px-3 py-2 rounded-lg text-sm transition-all border text-left ${
                     active
-                      ? "bg-[#7c6aff]/20 border-[#7c6aff]/50 text-white"
+                      ? "bg-[#f97316]/20 border-[#f97316]/50 text-white"
                       : "bg-white/[0.03] border-white/[0.07] text-white/40 hover:text-white/70 hover:border-white/20"
                   }`}
                 >
                   <span className="font-mono">{svc.name}</span>
                   {svc.price_usd !== undefined && (
-                    <span className={`ml-1.5 text-xs font-mono ${active ? "text-[#4fd8b8]" : "text-white/30"}`}>
+                    <span className={`ml-1.5 text-xs font-mono ${active ? "text-[#fdba74]" : "text-white/30"}`}>
                       ${svc.price_usd.toFixed(2)}
                     </span>
                   )}
@@ -346,7 +346,7 @@ export function InlineAgentPanel({ agent, onClose }: InlineAgentPanelProps) {
                   <button
                     onClick={() => handleUtility(svc)}
                     disabled={utilBusy}
-                    className="w-full px-3 py-2 bg-[#7c6aff]/10 hover:bg-[#7c6aff]/20 border border-[#7c6aff]/30 hover:border-[#7c6aff]/50 rounded-lg text-xs text-[#a598ff] hover:text-white transition-all font-mono disabled:opacity-40"
+                    className="w-full px-3 py-2 bg-[#f97316]/10 hover:bg-[#f97316]/20 border border-[#f97316]/30 hover:border-[#f97316]/50 rounded-lg text-xs text-[#fdba74] hover:text-white transition-all font-mono disabled:opacity-40"
                   >
                     {utilBusy ? "..." : utilLabel}
                   </button>
@@ -371,7 +371,7 @@ export function InlineAgentPanel({ agent, onClose }: InlineAgentPanelProps) {
                 placeholder={getInputPlaceholder(activeService)}
                 rows={4}
                 maxLength={1000}
-                className="w-full px-4 py-3 bg-[#111118] border border-white/[0.07] rounded-xl text-white placeholder-white/25 focus:outline-none focus:border-[#7c6aff]/50 focus:ring-1 focus:ring-[#7c6aff]/30 transition-all resize-none text-sm"
+                className="w-full px-4 py-3 bg-[#100d0a] border border-white/[0.07] rounded-xl text-white placeholder-white/25 focus:outline-none focus:border-[#f97316]/50 focus:ring-1 focus:ring-[#f97316]/30 transition-all resize-none text-sm"
               />
             )}
 
@@ -381,7 +381,7 @@ export function InlineAgentPanel({ agent, onClose }: InlineAgentPanelProps) {
                 onChange={(e) => setJsonInput(e.target.value)}
                 placeholder={'{\n  "path": "/my-file.txt",\n  "content": "Hello world"\n}'}
                 rows={6}
-                className="w-full px-4 py-3 bg-[#111118] border border-white/[0.07] rounded-xl text-white placeholder-white/25 focus:outline-none focus:border-[#7c6aff]/50 focus:ring-1 focus:ring-[#7c6aff]/30 transition-all resize-none text-sm font-mono"
+                className="w-full px-4 py-3 bg-[#100d0a] border border-white/[0.07] rounded-xl text-white placeholder-white/25 focus:outline-none focus:border-[#f97316]/50 focus:ring-1 focus:ring-[#f97316]/30 transition-all resize-none text-sm font-mono"
                 spellCheck={false}
               />
             )}
@@ -390,8 +390,8 @@ export function InlineAgentPanel({ agent, onClose }: InlineAgentPanelProps) {
               <label className="block w-full cursor-pointer">
                 <div className={`border-2 border-dashed rounded-xl px-5 py-8 text-center transition-all ${
                   file
-                    ? "border-[#4fd8b8]/40 bg-[#4fd8b8]/5"
-                    : "border-white/10 hover:border-white/20 bg-[#111118]"
+                    ? "border-[#fdba74]/40 bg-[#fdba74]/5"
+                    : "border-white/10 hover:border-white/20 bg-[#100d0a]"
                 }`}>
                   {file ? (
                     <div>
@@ -425,7 +425,7 @@ export function InlineAgentPanel({ agent, onClose }: InlineAgentPanelProps) {
             <button
               onClick={handleGenerate}
               disabled={!canSubmit || generating}
-              className="w-full py-3 bg-[#7c6aff] hover:bg-[#6b59ee] disabled:opacity-40 disabled:cursor-not-allowed rounded-xl font-medium transition-all text-sm"
+              className="w-full py-3 bg-[#f97316] hover:bg-[#ea6a0c] disabled:opacity-40 disabled:cursor-not-allowed rounded-xl font-medium transition-all text-sm"
             >
               {generating
                 ? `${actionVerb.charAt(0).toUpperCase() + actionVerb.slice(1)}ing...`
