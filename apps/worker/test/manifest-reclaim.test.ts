@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { handleManifest } from "../src/routes/manifest";
 import {
   FakeKV,
@@ -12,6 +12,30 @@ import {
 const ENS = "test-agent.agents.sources.eth";
 const OTHER = "0xBBBBbbbbBBBBbbbbBBBBbbbbBBBBbbbbBBBBbbbb";
 const DAY = 24 * 60 * 60 * 1000;
+
+// Registration now requires proof of control over the payout wallet. These
+// tests are about name availability, so the signature is stubbed to a simple
+// rule and attached wherever a request is expected to get past the 401.
+vi.mock("@worldcoin/agentkit", () => ({
+  verifyEVMSignature: vi.fn(async (_m: string, address: string, signature: string) => {
+    const m = signature.match(/^0x474f4f44([0-9a-fA-F]{40})$/);
+    return !!m && m[1].toLowerCase() === address.replace(/^0x/, "").toLowerCase();
+  }),
+}));
+
+let nonceSeq = 0;
+/** Attach a valid owner signature for `body.payment_address`. */
+function withSig<T extends { payment_address?: string }>(body: T) {
+  const addr = body.payment_address ?? OWNER;
+  return {
+    ...body,
+    owner_signature: {
+      signature: "0x474f4f44" + addr.replace(/^0x/, "").toLowerCase(),
+      nonce: `reclaim-nonce-${++nonceSeq}`,
+      issued_at: Date.now(),
+    },
+  };
+}
 
 /**
  * Name availability on the permanent path.
@@ -34,7 +58,7 @@ function seedRegistered(
 describe("permanent registration — name availability", () => {
   it("offers a 402 for a name nobody has registered", async () => {
     const kv = new FakeKV();
-    const res = await handleManifest(permanentRequest(makeManifest()), makeEnv(kv));
+    const res = await handleManifest(permanentRequest(withSig(makeManifest())), makeEnv(kv));
     expect(res.status).toBe(402);
   });
 
@@ -60,7 +84,7 @@ describe("permanent registration — name availability", () => {
     const kv = new FakeKV();
     seedRegistered(kv, { owner: OWNER, status: "active", expiresAt: Date.now() });
 
-    const res = await handleManifest(permanentRequest(makeManifest()), makeEnv(kv));
+    const res = await handleManifest(permanentRequest(withSig(makeManifest())), makeEnv(kv));
     expect(res.status).toBe(402);
   });
 
@@ -69,7 +93,7 @@ describe("permanent registration — name availability", () => {
     seedRegistered(kv, { owner: OWNER.toLowerCase(), status: "active", expiresAt: Date.now() });
 
     const res = await handleManifest(
-      permanentRequest(makeManifest({ payment_address: OWNER.toUpperCase().replace("0X", "0x") })),
+      permanentRequest(withSig(makeManifest({ payment_address: OWNER.toUpperCase().replace("0X", "0x") }))),
       makeEnv(kv)
     );
     expect(res.status).toBe(402);
@@ -106,7 +130,7 @@ describe("expired-trial reclaim", () => {
     const kv = new FakeKV();
     seedRegistered(kv, { owner: OTHER, status: "trial_expired", expiresAt: Date.now() - DAY });
 
-    const res = await handleManifest(permanentRequest(makeManifest()), makeEnv(kv));
+    const res = await handleManifest(permanentRequest(withSig(makeManifest())), makeEnv(kv));
     expect(res.status).toBe(402);
   });
 });
@@ -156,9 +180,9 @@ describe("manifest validation runs before any 402", () => {
 
   it("accepts services that are all public https", async () => {
     const res = await handleManifest(
-      permanentRequest(makeManifest({
+      permanentRequest(withSig(makeManifest({
         services: [{ name: "render", endpoint: "https://agent.example/render" }],
-      } as never)),
+      }) as never)),
       makeEnv()
     );
     expect(res.status).toBe(402);

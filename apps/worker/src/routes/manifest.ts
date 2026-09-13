@@ -5,6 +5,7 @@ import { pinJSON, fetchFromIPFS, PinataError, PUBLIC_IPFS_GATEWAY } from "../lib
 import { verifyPayment, markPaymentUsed, buildRegistration402Response } from "../lib/payment";
 import { lookupAgentBook } from "../lib/agentbook";
 import { isSafeAgentUrl } from "../lib/safe-url";
+import { verifyOwnerSignature, stripOwnerSignature, type OwnerSignature } from "../lib/owner-signature";
 import { incrementStat } from "./stats";
 
 export async function handleManifest(request: Request, env: Env): Promise<Response> {
@@ -18,7 +19,7 @@ export async function handleManifest(request: Request, env: Env): Promise<Respon
 
     // Always read + validate the body first so we can check name availability
     // before issuing a 402 — prevents charging for a name that's already taken.
-    const body = await request.json() as Partial<AgentManifest>;
+    const body = await request.json() as Partial<AgentManifest> & { owner_signature?: OwnerSignature };
     const validationError = validateManifest(body);
     if (validationError) {
       return new Response(JSON.stringify({ error: validationError }), {
@@ -31,6 +32,16 @@ export async function handleManifest(request: Request, env: Env): Promise<Respon
     if (!nameCheck.available) {
       return new Response(JSON.stringify({ error: nameCheck.reason }), {
         status: 409,
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+      });
+    }
+
+    // Prove control of the payout wallet BEFORE the 402, so a builder is never
+    // asked to pay for a listing their signature cannot authorise.
+    const sigCheck = await verifyOwnerSignature(body, "permanent", env);
+    if (!sigCheck.valid) {
+      return new Response(JSON.stringify({ error: sigCheck.error }), {
+        status: 401,
         headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
       });
     }
@@ -61,7 +72,7 @@ export async function handleManifest(request: Request, env: Env): Promise<Respon
     const agentBook = await lookupAgentBook(body.payment_address!, env.BASE_RPC_URL);
 
     const manifestToPin: AgentManifest = {
-      ...(body as AgentManifest),
+      ...(stripOwnerSignature(body) as AgentManifest),
       registered_at: Math.floor(now / 1000),
       ipfs_cid: "",
       manifest_version: "1.0",
@@ -113,7 +124,7 @@ export async function handleManifest(request: Request, env: Env): Promise<Respon
   }
 
   // Free trial — no payment required
-  const body = await request.json() as Partial<AgentManifest>;
+  const body = await request.json() as Partial<AgentManifest> & { owner_signature?: OwnerSignature };
   const validationError = validateManifest(body);
   if (validationError) {
     return new Response(JSON.stringify({ error: validationError }), {
@@ -130,6 +141,14 @@ export async function handleManifest(request: Request, env: Env): Promise<Respon
     });
   }
 
+  const trialSig = await verifyOwnerSignature(body, "trial", env);
+  if (!trialSig.valid) {
+    return new Response(JSON.stringify({ error: trialSig.error }), {
+      status: 401,
+      headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+    });
+  }
+
   const now = Date.now();
   const trialDays = parseInt(env.TRIAL_DURATION_DAYS, 10);
   const trialExpiresAt = now + trialDays * 24 * 60 * 60 * 1000;
@@ -138,7 +157,7 @@ export async function handleManifest(request: Request, env: Env): Promise<Respon
   const agentBook = await lookupAgentBook(body.payment_address!, env.BASE_RPC_URL);
 
   const manifestToPin: AgentManifest = {
-    ...(body as AgentManifest),
+    ...(stripOwnerSignature(body) as AgentManifest),
     registered_at: Math.floor(now / 1000),
     ipfs_cid: "",
     manifest_version: "1.0",

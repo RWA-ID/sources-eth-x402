@@ -116,3 +116,43 @@ export interface SharePayload {
   resultUrl?: string;
   resultPreview?: string;
 }
+
+/**
+ * Owner-signature message.
+ *
+ * SHARED ON PURPOSE. The worker verifies exactly the string the browser signs,
+ * so this must have one definition — two copies that drift by a single space
+ * make every signature fail verification with no useful error.
+ *
+ * Every field named here is part of what the signer agreed to. Adding a field
+ * to a listing without adding it here leaves that field unauthenticated.
+ */
+export interface OwnerSignature {
+  signature: string;
+  nonce: string;
+  issued_at: number;
+}
+
+export type ListingPlan = "trial" | "permanent";
+
+export function buildRegistrationMessage(params: {
+  ens: string;
+  endpoint: string;
+  payment_address: string;
+  plan: ListingPlan;
+  nonce: string;
+  issued_at: number;
+}): string {
+  return [
+    "sources.eth — Agent Listing Authorization",
+    "",
+    "I control this wallet and authorize this listing.",
+    "",
+    `Agent:    ${params.ens}`,
+    `Endpoint: ${params.endpoint}`,
+    `Payout:   ${params.payment_address}`,
+    `Plan:     ${params.plan}`,
+    `Nonce:    ${params.nonce}`,
+    `Issued:   ${new Date(params.issued_at).toISOString()}`,
+  ].join("\n");
+}

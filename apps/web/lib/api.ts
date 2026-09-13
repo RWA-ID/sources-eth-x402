@@ -1,4 +1,4 @@
-import type { AgentManifest, AgentCategory, AgentRating } from "@sources-eth/agent-manifest";
+import type { AgentManifest, AgentCategory, AgentRating, OwnerSignature } from "@sources-eth/agent-manifest";
 
 const WORKER_URL =
   process.env.NEXT_PUBLIC_WORKER_URL ?? "http://localhost:8787";
@@ -118,7 +118,8 @@ export async function generateWithPayment(
 
 export async function registerManifest(
   manifest: Omit<AgentManifest, "ipfs_cid" | "registered_at" | "manifest_version">,
-  plan: "trial" | "permanent" = "trial"
+  plan: "trial" | "permanent" = "trial",
+  ownerSignature?: OwnerSignature
 ): Promise<{ requires402: true; paymentRequest: unknown } | { cid: string; ens: string; trial_expires_at: number | null; status: string }> {
   const endpoint = plan === "permanent"
     ? `${WORKER_URL}/manifest?plan=permanent`
@@ -126,7 +127,8 @@ export async function registerManifest(
   const res = await fetch(endpoint, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(manifest),
+    // The worker requires proof that the signer controls payment_address.
+    body: JSON.stringify({ ...manifest, owner_signature: ownerSignature }),
   });
 
   if (res.status === 402) {

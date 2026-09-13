@@ -4,6 +4,9 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import type { AgentManifest, AgentCategory, AgentService } from "@sources-eth/agent-manifest";
 import { registerManifest, probeAgent, probeAgentOpenApi, importErc8004Agent } from "../lib/api";
+import { buildRegistrationMessage } from "@sources-eth/agent-manifest";
+import { useAppKit, useAppKitAccount } from "@reown/appkit/react";
+import { useSignMessage } from "wagmi";
 import { HumanVerifyWidget } from "./HumanVerifyWidget";
 import type { ProbeResult, ImportedAgent } from "../lib/api";
 import { AgentShareCard } from "./AgentShareCard";
@@ -132,6 +135,11 @@ export function RegisterForm({ plan = "trial" }: { plan?: Plan }) {
   const [trialExpiresAt, setTrialExpiresAt] = useState<number | null>(null);
   const [submitError, setSubmitError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [signing, setSigning] = useState(false);
+
+  const { open } = useAppKit();
+  const { address, isConnected } = useAppKitAccount();
+  const { signMessageAsync } = useSignMessage();
 
   const doProbe = async (
     name: string,
@@ -276,7 +284,45 @@ export function RegisterForm({ plan = "trial" }: { plan?: Plan }) {
         ...(agentServices.length > 0 && { services: agentServices }),
       };
 
-      const result = await registerManifest(manifest, plan);
+      // Prove control of the payout wallet. The worker verifies exactly this
+      // string, so it is built from the shared helper rather than re-typed.
+      if (!isConnected || !address) {
+        setSubmitError("Connect the payout wallet to sign this listing.");
+        open({ view: "Connect" });
+        return;
+      }
+      if (address.toLowerCase() !== manifest.payment_address.toLowerCase()) {
+        setSubmitError(
+          `Connected wallet ${address.slice(0, 6)}…${address.slice(-4)} is not the payout address ` +
+          `${manifest.payment_address.slice(0, 6)}…${manifest.payment_address.slice(-4)}. ` +
+          `Switch wallets to sign.`
+        );
+        return;
+      }
+
+      const nonce = crypto.randomUUID().replace(/-/g, "");
+      const issued_at = Date.now();
+      const message = buildRegistrationMessage({
+        ens: manifest.ens,
+        endpoint: manifest.endpoint,
+        payment_address: manifest.payment_address,
+        plan,
+        nonce,
+        issued_at,
+      });
+
+      let signature: string;
+      try {
+        setSigning(true);
+        signature = await signMessageAsync({ message });
+      } catch {
+        setSubmitError("Signature rejected — a listing must be authorized by its payout wallet.");
+        return;
+      } finally {
+        setSigning(false);
+      }
+
+      const result = await registerManifest(manifest, plan, { signature, nonce, issued_at });
       if (!("requires402" in result)) {
         setSuccessManifest({ ...manifest, ipfs_cid: result.cid, registered_at: Date.now() / 1000, manifest_version: "1.0" });
         setTrialExpiresAt(result.trial_expires_at);
@@ -620,6 +666,14 @@ export function RegisterForm({ plan = "trial" }: { plan?: Plan }) {
             </div>
           )}
 
+          <p className="text-xs text-white/35 leading-relaxed">
+            You&apos;ll be asked to sign a message with{" "}
+            <span className="font-mono text-white/55">
+              {parsed.probe.payTo.slice(0, 6)}…{parsed.probe.payTo.slice(-4)}
+            </span>{" "}
+            to prove you control the payout wallet. It&apos;s a signature, not a transaction — no gas, no funds moved.
+          </p>
+
           {submitError && <p className="text-red-400 text-sm">{submitError}</p>}
 
           <div className="flex gap-2">
@@ -628,14 +682,16 @@ export function RegisterForm({ plan = "trial" }: { plan?: Plan }) {
             </button>
             <button
               onClick={handlePublish}
-              disabled={loading || !category}
+              disabled={loading || signing || !category}
               className="flex-1 py-3 bg-[#f97316] hover:bg-[#ea6a0c] disabled:opacity-40 disabled:cursor-not-allowed rounded-lg font-medium transition-all"
             >
-              {loading
+              {signing
+                ? "Check your wallet to sign…"
+                : loading
                 ? "Publishing..."
                 : plan === "permanent"
-                ? "Register permanently — $49"
-                : "Start free trial"}
+                ? "Sign & register — $49"
+                : "Sign & start free trial"}
             </button>
           </div>
         </div>
