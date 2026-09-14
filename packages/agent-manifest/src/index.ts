@@ -156,3 +156,28 @@ export function buildRegistrationMessage(params: {
     `Issued:   ${new Date(params.issued_at).toISOString()}`,
   ].join("\n");
 }
+
+/**
+ * Message signed to claim or rotate an agent's forwarding secret.
+ *
+ * Deliberately distinct from buildRegistrationMessage so a signature captured
+ * from a registration can never be replayed to extract a secret.
+ */
+export function buildSecretMessage(params: {
+  ens: string;
+  payment_address: string;
+  nonce: string;
+  issued_at: number;
+}): string {
+  return [
+    "sources.eth — Agent Secret Request",
+    "",
+    "I control this wallet and request the forwarding secret for this listing.",
+    "This rotates any previous secret.",
+    "",
+    `Agent:  ${params.ens}`,
+    `Payout: ${params.payment_address}`,
+    `Nonce:  ${params.nonce}`,
+    `Issued: ${new Date(params.issued_at).toISOString()}`,
+  ].join("\n");
+}

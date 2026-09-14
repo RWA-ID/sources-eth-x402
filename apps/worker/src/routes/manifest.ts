@@ -7,6 +7,7 @@ import { lookupAgentBook } from "../lib/agentbook";
 import { isSafeAgentUrl } from "../lib/safe-url";
 import { verifyOwnerSignature, stripOwnerSignature, type OwnerSignature } from "../lib/owner-signature";
 import { incrementStat } from "./stats";
+import { generateAgentSecret, secretKey } from "../lib/agent-auth";
 
 export async function handleManifest(request: Request, env: Env): Promise<Response> {
   const url = new URL(request.url);
@@ -117,8 +118,16 @@ export async function handleManifest(request: Request, env: Env): Promise<Respon
     await markPaymentUsed(txHash, manifestToPin.ens, env.AGENTS_KV);
     await incrementStat(env.AGENTS_KV, "stats:permanent_agents");
 
+    const permanentSecret = generateAgentSecret();
+    await env.AGENTS_KV.put(secretKey(manifestToPin.ens), permanentSecret);
+
     return new Response(
-      JSON.stringify({ success: true, cid, ens: manifestToPin.ens, trial_expires_at: null, status: "active" }),
+      JSON.stringify({
+        success: true, cid, ens: manifestToPin.ens, trial_expires_at: null, status: "active",
+        // Shown once. Providers use it to verify that a forwarded request
+        // really came from sources.eth and was really paid for.
+        agent_secret: permanentSecret,
+      }),
       { headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } }
     );
   }
@@ -192,10 +201,14 @@ export async function handleManifest(request: Request, env: Env): Promise<Respon
 
   await storeAgent(manifestToPin, reg, env.AGENTS_KV);
 
+  const trialSecret = generateAgentSecret();
+  await env.AGENTS_KV.put(secretKey(manifestToPin.ens), trialSecret);
+
   return new Response(
     JSON.stringify({
       success: true,
       cid,
+      agent_secret: trialSecret,
       ens: manifestToPin.ens,
       ipfs_url: `${PUBLIC_IPFS_GATEWAY}${cid}`,
       trial_expires_at: trialExpiresAt,

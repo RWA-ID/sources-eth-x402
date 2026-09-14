@@ -2,6 +2,7 @@ import type { Env } from "../lib/registry";
 import { getAgent } from "../lib/registry";
 import { build402Response, verifyPayment, markPaymentUsed } from "../lib/payment";
 import { incrementStat } from "./stats";
+import { buildForwardHeaders } from "../lib/agent-auth";
 
 export async function handleGenerate(request: Request, env: Env): Promise<Response> {
   const body = await request.json() as { ens: string; prompt?: string; sub_path?: string; [key: string]: unknown };
@@ -101,6 +102,10 @@ export async function handleGenerate(request: Request, env: Env): Promise<Respon
 
   // If body contains file_base64, convert to multipart/form-data for the agent
   let agentResponse: Response;
+  // Signed proof that we verified this payment, plus the txHash so a provider
+  // can check the chain itself rather than taking our word for it.
+  const fwdHeaders = await buildForwardHeaders(ens, txHash, env.AGENTS_KV);
+
   if (agentInputs.file_base64 && typeof agentInputs.file_base64 === "string") {
     const { file_base64, filename, content_type, ...rest } = agentInputs as {
       file_base64: string;
@@ -120,13 +125,13 @@ export async function handleGenerate(request: Request, env: Env): Promise<Respon
     }
     agentResponse = await fetch(targetUrl, {
       method: "POST",
-      headers: { "X-SOURCES-ETH": "1" },
+      headers: fwdHeaders,
       body: form,
     });
   } else {
     agentResponse = await fetch(targetUrl, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "X-SOURCES-ETH": "1" },
+      headers: { ...fwdHeaders, "Content-Type": "application/json" },
       body: JSON.stringify({ ...(prompt !== undefined && { prompt }), ...agentInputs }),
     });
   }

@@ -35,15 +35,20 @@ export interface SignatureCheck {
   error?: string;
 }
 
-export async function verifyOwnerSignature(
-  body: Partial<AgentManifest> & { owner_signature?: OwnerSignature },
-  plan: "trial" | "permanent",
-  env: Env
+/**
+ * Shared core: shape, freshness, single-use nonce, then the signature itself.
+ * `message` is whatever the caller expects the wallet to have signed, so the
+ * same guarantees apply to registration and to secret requests.
+ */
+export async function verifySignedMessage(
+  message: string,
+  address: string,
+  sig: OwnerSignature | undefined,
+  env: Env,
+  walletLabel = "the expected wallet"
 ): Promise<SignatureCheck> {
-  const sig = body.owner_signature;
-
   if (!sig || typeof sig !== "object") {
-    return { valid: false, error: "owner_signature is required: sign the listing with your payout wallet" };
+    return { valid: false, error: "owner_signature is required: sign with your payout wallet" };
   }
   if (typeof sig.signature !== "string" || !/^0x[0-9a-fA-F]+$/.test(sig.signature)) {
     return { valid: false, error: "owner_signature.signature must be a 0x-prefixed hex string" };
@@ -56,51 +61,49 @@ export async function verifyOwnerSignature(
   }
 
   const age = Date.now() - sig.issued_at;
-  if (age > MAX_SIGNATURE_AGE_MS) {
-    return { valid: false, error: "Signature has expired — sign again" };
-  }
+  if (age > MAX_SIGNATURE_AGE_MS) return { valid: false, error: "Signature has expired — sign again" };
   if (age < -MAX_SIGNATURE_FUTURE_MS) {
     return { valid: false, error: "Signature is dated in the future — check your system clock" };
   }
 
-  // Replay: a nonce is good exactly once, even inside its validity window.
   const nonceKey = `sig-nonce:${sig.nonce}`;
   if (await env.AGENTS_KV.get(nonceKey)) {
     return { valid: false, error: "This signature has already been used — sign again" };
   }
 
+  let ok: boolean;
+  try {
+    ok = await verifyEVMSignature(message, address, sig.signature, "eip155:8453", env.BASE_RPC_URL);
+  } catch {
+    return { valid: false, error: "Could not verify signature — try again shortly" };
+  }
+  if (!ok) return { valid: false, error: `Signature does not match ${walletLabel}` };
+
+  await env.AGENTS_KV.put(nonceKey, "1", { expirationTtl: NONCE_TTL_SECONDS });
+  return { valid: true };
+}
+
+export async function verifyOwnerSignature(
+  body: Partial<AgentManifest> & { owner_signature?: OwnerSignature },
+  plan: "trial" | "permanent",
+  env: Env
+): Promise<SignatureCheck> {
+  const sig = body.owner_signature;
   const message = buildRegistrationMessage({
     ens: body.ens!,
     endpoint: body.endpoint!,
     payment_address: body.payment_address!,
     plan,
-    nonce: sig.nonce,
-    issued_at: sig.issued_at,
+    nonce: sig?.nonce ?? "",
+    issued_at: sig?.issued_at ?? 0,
   });
-
-  let ok: boolean;
-  try {
-    // Covers EOAs (ecrecover) and smart wallets (ERC-1271). Base is the only
-    // chain the marketplace settles on, so it is the only chain we verify against.
-    ok = await verifyEVMSignature(
-      message,
-      body.payment_address!,
-      sig.signature,
-      "eip155:8453",
-      env.BASE_RPC_URL
-    );
-  } catch {
-    // Fail CLOSED. A verification we could not complete is not a pass — that
-    // mistake is what left the World badge silently broken.
-    return { valid: false, error: "Could not verify signature — try again shortly" };
+  const res = await verifySignedMessage(message, body.payment_address!, sig, env, "payment_address");
+  // Keep the original wording for the missing-signature case; it tells the
+  // builder what to do, not just what was wrong.
+  if (!res.valid && !sig) {
+    return { valid: false, error: "owner_signature is required: sign the listing with your payout wallet" };
   }
-
-  if (!ok) {
-    return { valid: false, error: "Signature does not match payment_address" };
-  }
-
-  await env.AGENTS_KV.put(nonceKey, "1", { expirationTtl: NONCE_TTL_SECONDS });
-  return { valid: true };
+  return res;
 }
 
 /** Authorization, not listing content — never pin it. */

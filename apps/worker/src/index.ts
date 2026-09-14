@@ -16,6 +16,7 @@ import { handleStats } from "./routes/stats";
 import { handleX402 } from "./routes/x402";
 import { handleOpenApi } from "./routes/openapi";
 import { handleProbeOpenApi } from "./routes/probe-openapi";
+import { handleAgentSecret } from "./routes/agent-secret";
 
 function cors(response: Response): Response {
   const headers = new Headers(response.headers);
@@ -110,6 +111,11 @@ export default {
     // GET /probe-openapi — discover paid agent via OpenAPI spec
     if (method === "GET" && path === "/probe-openapi") {
       return cors(await handleProbeOpenApi(request, env));
+    }
+
+    // POST /agent-secret — issue or rotate an agent's forwarding secret
+    if (method === "POST" && path === "/agent-secret") {
+      return cors(await handleAgentSecret(request, env));
     }
 
     // GET /discover — ERC-8004 registry discovery
