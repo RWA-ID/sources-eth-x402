@@ -5,12 +5,29 @@ import { useSearchParams } from "next/navigation";
 import type { AgentManifest, AgentCategory, AgentService } from "@sources-eth/agent-manifest";
 import { registerManifest, probeAgent, probeAgentOpenApi, importErc8004Agent } from "../lib/api";
 import { buildRegistrationMessage } from "@sources-eth/agent-manifest";
-import { useAppKit, useAppKitAccount } from "@reown/appkit/react";
-import { useSignMessage, useChainId, useSwitchChain } from "wagmi";
+import { useAppKit, useAppKitAccount, useAppKitNetwork, useAppKitProvider, useDisconnect } from "@reown/appkit/react";
 
 /** Base mainnet. Inlined rather than imported from @reown/appkit/networks,
  *  which pulls its entire chain registry into this page. */
 const BASE_CHAIN_ID = 8453;
+
+/**
+ * Signing goes through AppKit's EIP-1193 provider, not wagmi.
+ *
+ * wagmi 3.x is installed but @reown/appkit-adapter-wagmi 1.8.19 builds
+ * connectors for wagmi 2.x — its peer range ">=2.19.5" admits 3.x, so nothing
+ * warns, and the first call into a connector dies with
+ *   r.connector.getChainId is not a function
+ * Talking to the provider directly avoids the adapter entirely.
+ */
+interface Eip1193Provider {
+  request(args: { method: string; params?: unknown[] }): Promise<unknown>;
+}
+
+function toHex(message: string): string {
+  const bytes = new TextEncoder().encode(message);
+  return "0x" + Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+}
 import { HumanVerifyWidget } from "./HumanVerifyWidget";
 import type { ProbeResult, ImportedAgent } from "../lib/api";
 import { AgentShareCard } from "./AgentShareCard";
@@ -143,9 +160,9 @@ export function RegisterForm({ plan = "trial" }: { plan?: Plan }) {
 
   const { open } = useAppKit();
   const { address, isConnected } = useAppKitAccount();
-  const { signMessageAsync } = useSignMessage();
-  const chainId = useChainId();
-  const { switchChainAsync } = useSwitchChain();
+  const { disconnect } = useDisconnect();
+  const { walletProvider } = useAppKitProvider<Eip1193Provider>("eip155");
+  const { chainId, switchNetwork } = useAppKitNetwork();
 
   const doProbe = async (
     name: string,
@@ -320,24 +337,29 @@ export function RegisterForm({ plan = "trial" }: { plan?: Plan }) {
       // The app only declares Base. A wallet on another chain makes AppKit
       // refuse before any signing prompt appears, which reads to the user as
       // "signature rejected" when they were never actually asked.
+      if (!walletProvider) {
+        setSubmitError("Wallet connection is not ready. Reconnect and try again.");
+        return;
+      }
+
+      // Signing does not require a particular chain, so a wrong network is not
+      // fatal here — nudge, but never block on it.
       if (chainId !== BASE_CHAIN_ID) {
         try {
-          setSigning(true);
-          await switchChainAsync({ chainId: BASE_CHAIN_ID });
+          switchNetwork?.({ id: BASE_CHAIN_ID, caipNetworkId: `eip155:${BASE_CHAIN_ID}` } as never);
         } catch {
-          setSubmitError(
-            `Your wallet is on chain ${chainId ?? "unknown"}. Switch it to Base (8453) to sign this listing.`
-          );
-          return;
-        } finally {
-          setSigning(false);
+          /* signing still works on another chain */
         }
       }
 
       let signature: string;
       try {
         setSigning(true);
-        signature = await signMessageAsync({ message });
+        const result = await walletProvider.request({
+          method: "personal_sign",
+          params: [toHex(message), manifest.payment_address],
+        });
+        signature = String(result);
       } catch (e) {
         // Report what actually failed. Swallowing this turned a wrong-chain
         // error and a genuine user rejection into the same useless sentence.
@@ -694,6 +716,25 @@ export function RegisterForm({ plan = "trial" }: { plan?: Plan }) {
                 <li>✓ Priority for featured placement</li>
                 <li className="text-white/30">Payment via USDC on Base — you will see a QR code</li>
               </ul>
+            </div>
+          )}
+
+          {isConnected && address && (
+            <div className="flex items-center gap-2 flex-wrap text-xs">
+              <span className="text-white/35">Signing wallet</span>
+              <span className="font-mono text-white/60">{address.slice(0, 6)}…{address.slice(-4)}</span>
+              {address.toLowerCase() === parsed.probe.payTo.toLowerCase() ? (
+                <span className="text-[#fdba74]">✓ matches payout</span>
+              ) : (
+                <span className="text-red-400/70">✗ not the payout address</span>
+              )}
+              <button
+                type="button"
+                onClick={() => { disconnect(); }}
+                className="ml-auto px-2.5 py-1 rounded-md bg-white/[0.05] hover:bg-white/[0.10] border border-white/[0.08] text-white/50 hover:text-white transition-colors"
+              >
+                Disconnect
+              </button>
             </div>
           )}
 

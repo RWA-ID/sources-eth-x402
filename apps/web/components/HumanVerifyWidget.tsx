@@ -159,9 +159,20 @@ export function HumanVerifyWidget({ compact = false, paymentAddress }: Props) {
               <span className="font-mono text-xs text-white/40 truncate">{address?.slice(0, 10)}…</span>
               <span className="text-xs text-white/25">— not in AgentBook</span>
             </div>
+            <div className="mb-2 px-2.5 py-2 rounded-lg bg-[#f97316]/[0.08] border border-[#f97316]/25">
+              <p className="text-xs text-[#fdba74] font-medium mb-0.5">
+                Only run this if you are Orb-verified.
+              </p>
+              <p className="text-[11px] text-white/45 leading-relaxed">
+                It needs a World App account verified in person at an Orb. Device-level
+                verification is not enough, and Orbs are not available everywhere. Without
+                one the command will not complete — the badge is optional, so skip it and
+                list your agent as normal.
+              </p>
+            </div>
             <p className="text-xs text-white/35 mb-1.5">
-              Run this once to link this wallet to your World ID. It opens a World App
-              verification, then registers the wallet on-chain — you only do it once per wallet.
+              If you are verified, run this once to link this wallet to your World ID. It opens
+              a World App verification, then registers the wallet on-chain — once per wallet.
             </p>
             <div className="relative">
               <code className="block text-xs text-[#fdba74] bg-black/30 rounded px-2 py-1.5 pr-16 font-mono break-all">
