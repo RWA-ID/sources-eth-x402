@@ -120,7 +120,7 @@ export async function registerManifest(
   manifest: Omit<AgentManifest, "ipfs_cid" | "registered_at" | "manifest_version">,
   plan: "trial" | "permanent" = "trial",
   ownerSignature?: OwnerSignature
-): Promise<{ requires402: true; paymentRequest: unknown } | { cid: string; ens: string; trial_expires_at: number | null; status: string }> {
+): Promise<{ requires402: true; paymentRequest: unknown } | { cid: string; ens: string; trial_expires_at: number | null; status: string; agent_secret?: string }> {
   const endpoint = plan === "permanent"
     ? `${WORKER_URL}/manifest?plan=permanent`
     : `${WORKER_URL}/manifest`;

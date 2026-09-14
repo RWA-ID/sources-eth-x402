@@ -154,6 +154,8 @@ export function RegisterForm({ plan = "trial" }: { plan?: Plan }) {
   // Success state
   const [successManifest, setSuccessManifest] = useState<AgentManifest | null>(null);
   const [trialExpiresAt, setTrialExpiresAt] = useState<number | null>(null);
+  const [agentSecret, setAgentSecret] = useState<string | null>(null);
+  const [secretCopied, setSecretCopied] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [loading, setLoading] = useState(false);
   const [signing, setSigning] = useState(false);
@@ -379,6 +381,7 @@ export function RegisterForm({ plan = "trial" }: { plan?: Plan }) {
       if (!("requires402" in result)) {
         setSuccessManifest({ ...manifest, ipfs_cid: result.cid, registered_at: Date.now() / 1000, manifest_version: "1.0" });
         setTrialExpiresAt(result.trial_expires_at);
+        setAgentSecret(result.agent_secret ?? null);
       }
     } catch (e) {
       setSubmitError(e instanceof Error ? e.message : "Registration failed");
@@ -405,6 +408,61 @@ export function RegisterForm({ plan = "trial" }: { plan?: Plan }) {
           <div className="text-xs text-white/30 mt-3">IPFS CID</div>
           <div className="font-mono text-xs text-white/50 break-all">{successManifest.ipfs_cid}</div>
         </div>
+        {agentSecret && (
+          <div className="bg-[#17130f] border border-[#f97316]/40 rounded-xl p-4 space-y-2.5">
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-[11px] uppercase tracking-[0.07em] text-[#fdba74]">
+                Agent secret
+              </span>
+              <span className="text-[11px] text-white/35">— shown once, right now</span>
+            </div>
+
+            <div className="relative">
+              <code className="block text-xs text-[#fdba74] bg-black/40 rounded-lg px-3 py-2.5 pr-16 font-mono break-all">
+                {agentSecret}
+              </code>
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(agentSecret);
+                  } catch {
+                    const ta = document.createElement("textarea");
+                    ta.value = agentSecret;
+                    document.body.appendChild(ta);
+                    ta.select();
+                    try { document.execCommand("copy"); } catch { /* nothing else to try */ }
+                    document.body.removeChild(ta);
+                  }
+                  setSecretCopied(true);
+                  setTimeout(() => setSecretCopied(false), 1800);
+                }}
+                className="absolute top-2 right-2 px-2.5 py-1 rounded-md bg-white/[0.08] hover:bg-white/[0.16] border border-white/[0.10] font-mono text-[10px] text-white/70 hover:text-white transition-colors"
+              >
+                {secretCopied ? "Copied!" : "Copy"}
+              </button>
+            </div>
+
+            <p className="text-xs text-white/45 leading-relaxed">
+              Store this somewhere safe. We cannot show it again — if you lose it, you can
+              issue a new one, which immediately invalidates this one.
+            </p>
+            <p className="text-xs text-white/45 leading-relaxed">
+              Your endpoint uses it to confirm a request really came from sources.eth and was
+              really paid for. If your endpoint already enforces x402, verify this signature
+              instead of trusting the request — otherwise anyone can call you for free.{" "}
+              <a
+                href="https://github.com/RWA-ID/sources-eth-x402/blob/main/docs/verifying-forwarded-requests.md"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#f97316] hover:text-[#fdba74] transition-colors"
+              >
+                How to verify →
+              </a>
+            </p>
+          </div>
+        )}
+
         <div className="bg-[#f97316]/10 border border-[#f97316]/20 rounded-xl p-4 text-sm text-white/60">
           After your trial ends on {expiry}, pay $49 to list permanently. No recurring fees, ever.
           <br /><br />
