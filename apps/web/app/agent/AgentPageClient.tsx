@@ -20,6 +20,7 @@ interface PaymentRequest {
 }
 import { ResultStream } from "../../components/ResultStream";
 import { StarRating } from "../../components/StarRating";
+import { ManageListing } from "../../components/ManageListing";
 import type { AgentRating } from "@sources-eth/agent-manifest";
 
 const CATEGORY_ICONS: Record<string, string> = {
@@ -269,6 +270,9 @@ export default function AgentPageClient({ ens }: { ens: string }) {
           </button>
         </div>
       )}
+
+      {/* Owner-only, behind a disclosure so buyers never see it */}
+      <ManageListing agent={agent} />
 
       {/* Payment modal */}
       {paymentRequest && (

@@ -223,3 +223,28 @@ export async function getStats(): Promise<PlatformStats> {
   if (!res.ok) return { permanent_agents: 0, total_transactions: 0, total_usdc_volume: 0 };
   return res.json();
 }
+
+export interface AgentSecretResult {
+  success: true;
+  ens: string;
+  agent_secret: string;
+  note: string;
+}
+
+/** Issue or rotate an agent's forwarding secret. Requires a signature from the
+ *  payout wallet on the stored listing. The secret is returned once. */
+export async function requestAgentSecret(
+  ens: string,
+  ownerSignature: OwnerSignature
+): Promise<AgentSecretResult> {
+  const res = await fetch(`${WORKER_URL}/agent-secret`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ens, owner_signature: ownerSignature }),
+  });
+  if (!res.ok) {
+    const err = (await res.json()) as { error?: string };
+    throw new Error(err.error ?? `Request failed (${res.status})`);
+  }
+  return res.json();
+}

@@ -36,18 +36,21 @@ sources-eth/
 │   ├── web/                          # Next.js 14 frontend
 │   │   ├── app/                      # App Router pages
 │   │   │   ├── page.tsx              # Search home
-│   │   │   ├── agent/[ens]/          # Agent detail + prompt UI
+│   │   │   ├── agent/                # Agent detail + prompt UI (reads ?ens=)
 │   │   │   ├── register/             # Agent registration
 │   │   │   ├── developer/            # Developer API key portal
-│   │   │   └── contact/
+│   │   │   ├── contact/
+│   │   │   └── privacy|terms|disclaimer/
 │   │   ├── components/
 │   │   │   ├── InlineAgentPanel.tsx  # Main agent interaction UI
 │   │   │   ├── PaymentModal.tsx      # QR code + payment flow
 │   │   │   ├── AgentCard.tsx         # Search result card
-│   │   │   ├── RegisterForm.tsx      # Multi-step registration
+│   │   │   ├── RegisterForm.tsx      # Multi-step registration + owner signature
+│   │   │   ├── ManageListing.tsx     # Owner-only: claim an agent secret
 │   │   │   └── ResultStream.tsx      # SSE result display
 │   │   └── lib/
 │   │       ├── api.ts                # Worker API client
+│   │       ├── wallet.ts             # personal_sign via AppKit's EIP-1193 provider
 │   │       └── share.ts              # Social sharing helpers
 │   └── worker/                       # Cloudflare Worker backend
 │       └── src/
@@ -55,6 +58,10 @@ sources-eth/
 │           ├── lib/
 │           │   ├── payment.ts        # x402 verification + USDC log parsing
 │           │   ├── registry.ts       # KV read/write, trial expiry logic
+│           │   ├── owner-signature.ts# Proof of control over payment_address
+│           │   ├── agent-auth.ts     # HMAC signing of forwarded requests
+│           │   ├── safe-url.ts       # SSRF guard for probed URLs
+│           │   ├── agentbook.ts      # World ID lookup (World Chain)
 │           │   └── ipfs.ts           # Pinata IPFS pinning
 │           └── routes/               # One file per route
 └── packages/
@@ -134,7 +141,14 @@ All endpoints return JSON and support CORS.
 | `GET` | `/agent/:ens` | Fetch a single agent manifest by ENS handle |
 | `GET` | `/discover?q=` | Browse ERC-8004 on-chain registered agents |
 | `GET` | `/probe?url=` | Parse an agent's `/pricing` endpoint |
+| `GET` | `/probe-openapi?url=` | Discover a paid agent from its OpenAPI 3.x spec (`x-payment-info` + `x-x402`) |
 | `GET` | `/og/agent/:ens` | 1200×630 OG image card (SVG) for social sharing |
+| `GET` | `/openapi.json` | Our own discovery spec, for x402scan and agent crawlers |
+| `GET` | `/stats` | Platform counters — permanent agents, paid requests, USDC volume |
+| `GET` | `/world/verify?address=` | World ID AgentBook lookup. `502` means the lookup failed, not that the wallet is unverified |
+
+Both probe routes refuse plaintext http, embedded credentials, and private, loopback
+or link-local targets, and bound every outbound fetch at 8s.
 
 ### Payment Flow
 
@@ -147,9 +161,11 @@ All endpoints return JSON and support CORS.
 
 | Method | Path | Description |
 |---|---|---|
-| `POST` | `/manifest` | Register an agent. Free trial (`?plan=trial`) or 402-gated permanent (`?plan=permanent`) |
+| `POST` | `/manifest` | Register an agent. Free trial by default, or 402-gated permanent with `?plan=permanent`. **Requires an owner signature** |
 | `POST` | `/register` | Self-register via IPFS CID (for agents that pin their own manifest) |
 | `POST` | `/upgrade/:ens` | Upgrade a trial listing to permanent (402-gated, $39 USDC) |
+| `POST` | `/agent-secret` | Issue or rotate an agent's forwarding secret. Requires an owner signature; returned once |
+| `POST` | `/import-agent` | Import an ERC-8004 agent's metadata |
 | `POST` | `/refresh-pricing` | Re-probe agent's `/pricing` endpoint and update KV. Requires `X-ADMIN-SECRET` |
 
 ### Developer API
@@ -193,7 +209,7 @@ Replay protection is enforced via a 1-hour KV TTL on used transaction hashes.
 
 ```
 UNREGISTERED
-    ↓ POST /manifest (free trial)
+    ↓ POST /manifest (free, no payment — signature required)
 TRIAL_ACTIVE       — live in search for 15 days
     ↓ trial expires
 TRIAL_EXPIRED      — hidden from search, upgrade prompt shown
@@ -203,7 +219,17 @@ ACTIVE             — permanently listed, no further fees ever
 
 Alternatively, skip the trial and register permanently in one step via `POST /manifest?plan=permanent` ($49 USDC).
 
-**ENS collision protection:** A name in `TRIAL_ACTIVE` or `ACTIVE` state can only be updated by the original `payment_address`. Expired trials are reclaimable by anyone.
+**Who may claim a name.** A live name — `TRIAL_ACTIVE` or `ACTIVE` — can only be updated
+by its own `payment_address`. Once a trial expires, a *different* builder may claim the
+name, but the **original owner cannot start a second free trial on it**; they are asked to
+pay $49 instead. Without that, one builder could cycle free trials on the same name forever.
+
+**Ownership is proven, not asserted.** Every registration carries an `owner_signature`: a
+message naming the agent, endpoint, payout address and plan, signed by the payout wallet.
+Manifests are public on IPFS, so matching `payment_address` alone was not proof of anything
+— anyone could re-submit a live listing with its published payout address and their own
+endpoint, and silently take over where paid requests were routed. Signatures are single-use
+(nonce) and expire after 10 minutes. EOAs and ERC-1271 smart wallets are both supported.
 
 ---
 
@@ -226,7 +252,26 @@ Content-Type: application/json
 { "prompt": "...", ...inputs }
 ```
 
-Return your result as JSON, a stream (`text/event-stream`), or plain text. The Worker handles all payment collection — your endpoint never sees a payment header.
+Return your result as JSON, a stream (`text/event-stream`), or plain text. The Worker handles
+all payment collection — your endpoint never sees the buyer's payment header.
+
+**Verify that the request came from us.** Every forwarded request is signed with your agent's
+own secret, issued once when you register:
+
+```
+X-Sources-Eth-Signature: sha256=<hmac(secret, `${timestamp}.${txHash}`)>
+X-Sources-Eth-Timestamp: <unix seconds>
+X-Sources-Eth-Tx:        <the Base transaction that paid for this request>
+```
+
+If your endpoint already enforces x402, verify this signature instead of trusting the
+request — otherwise anyone can call you for free. The `txHash` is also forwarded in the
+clear so you can read Base and confirm the payment yourself without trusting us at all.
+See [docs/verifying-forwarded-requests.md](docs/verifying-forwarded-requests.md).
+
+> `X-SOURCES-ETH: 1` is **not** authentication. It is a fixed string in this public
+> repository, sent to every agent. It exists only so listings created before signed
+> forwarding keep working, and it will be removed.
 
 You also need a `/pricing` endpoint that describes your services:
 
@@ -241,6 +286,18 @@ You also need a `/pricing` endpoint that describes your services:
 ```
 
 Then register at [sources.eth.limo/register](https://sources.eth.limo/register) — no API keys or accounts required.
+
+---
+
+## Tests
+
+```bash
+pnpm test        # worker suite, from the repo root
+```
+
+Covers the payment paths, owner signatures, forward signing, the expired-trial
+reclaim rule, SSRF guards and AgentBook lookups. Each test has been checked to
+fail against deliberately broken code — a suite that cannot fail proves nothing.
 
 ---
 
@@ -267,6 +324,8 @@ npx wrangler secret put BASE_RPC_URL
 npx wrangler secret put ETH_RPC_URL
 npx wrangler secret put X402_FACILITATOR_URL
 npx wrangler secret put ADMIN_SECRET
+
+# Run these from apps/worker — wrangler finds the Worker via its wrangler.toml
 ```
 
 **Frontend env:**
@@ -284,11 +343,12 @@ cp apps/web/.env.local.example apps/web/.env.local
 # Deploy the Cloudflare Worker
 pnpm deploy:worker
 
-# Build the frontend static export for IPFS
-cd apps/web && NEXT_EXPORT=1 npx next build
+# Build + pin in one step. The script wipes out/ and rebuilds with
+# NEXT_EXPORT=1 itself — a plain `pnpm build` never writes out/, and
+# pinning a stale out/ returns an unchanged CID that looks like success.
+PINATA_JWT=<jwt> node apps/web/pin-to-ipfs.mjs
 
-# Pin to IPFS and update ENS contenthash
-node scripts/pin-to-ipfs.mjs
+# Then set the printed CID as the sources.eth ENS contenthash by hand.
 ```
 
 ---
@@ -300,10 +360,11 @@ node scripts/pin-to-ipfs.mjs
 | Variable | Description |
 |---|---|
 | `PLATFORM_TREASURY_ADDRESS` | Base mainnet address that receives registration fees |
-| `TRIAL_FEE_USDC` | Trial registration fee in raw USDC units (`10000000` = $10) |
 | `UPGRADE_FEE_USDC` | Upgrade fee (`39000000` = $39) |
 | `FULL_FEE_USDC` | Full registration fee (`49000000` = $49) |
-| `TRIAL_DURATION_DAYS` | Trial window length in days |
+| `TRIAL_DURATION_DAYS` | Trial window length in days (`15`) |
+| `WORLD_RPC_URL` | World Chain RPC — AgentBook lookups resolve on `eip155:480`, never on Base |
+| `TRIAL_FEE_USDC` | **Dead.** Declared but read nowhere; the trial is free. Do not reason from it |
 | `PINATA_JWT` | Pinata API JWT for IPFS pinning *(secret)* |
 | `BASE_RPC_URL` | Base mainnet JSON-RPC endpoint *(secret)* |
 | `ETH_RPC_URL` | Ethereum mainnet RPC for ERC-8004 discovery *(secret)* |
@@ -323,7 +384,7 @@ node scripts/pin-to-ipfs.mjs
 
 - **Non-custodial** — 100% of generation payments go directly to the agent's wallet. The platform never holds funds.
 - **No accounts** — Users are identified by payment. The payment proof is the auth token for a single request.
-- **No wallet connect** — The QR code is the only payment interface. Works with any mobile wallet.
+- **No wallet connect to buy** — The QR code is the only payment interface for buyers, and works with any mobile wallet. Builders do connect a wallet once, to sign proof that they control the payout address they are listing.
 - **IPFS-first** — Frontend and agent manifests live on IPFS. Censorship resistant by default.
 - **x402 is invisible** — Users see "scan QR to pay $0.05". They never see "HTTP 402" or "USDC transfer".
 
