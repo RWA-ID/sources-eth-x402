@@ -410,7 +410,7 @@ export function RegisterForm({ plan = "trial" }: { plan?: Plan }) {
           <br /><br />
           Visit{" "}
           <span className="font-mono text-[#f97316]">
-            sources.eth.limo/agent?ens={successManifest.ens}
+            sources.eth.limo/agent/?ens={successManifest.ens}
           </span>{" "}
           to upgrade anytime.
         </div>

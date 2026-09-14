@@ -59,7 +59,7 @@ interface AgentShareCardProps {
 export function AgentShareCard({ manifest }: AgentShareCardProps) {
   const [copied, setCopied] = useState(false);
   const texts = buildAgentShareText(manifest);
-  const link = `https://sources.eth.limo/agent?ens=${manifest.ens}`;
+  const link = `https://sources.eth.limo/agent/?ens=${manifest.ens}`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(link).then(() => {

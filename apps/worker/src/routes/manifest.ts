@@ -372,7 +372,7 @@ async function checkNameAvailable(
       // Original owner cannot grab a second free trial — must upgrade
       return {
         available: false,
-        reason: `Your free trial for ${ens} has expired. Pay $49 to go permanent at sources.eth.limo/agent?ens=${ens}`,
+        reason: `Your free trial for ${ens} has expired. Pay $49 to go permanent at sources.eth.limo/agent/?ens=${ens}`,
       };
     }
     // Different owner — expired name is up for grabs

@@ -20,7 +20,7 @@ function ShareMenu({ agent }: { agent: AgentManifest }) {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  const link = `https://sources.eth.limo/agent?ens=${encodeURIComponent(agent.ens)}`;
+  const link = `https://sources.eth.limo/agent/?ens=${encodeURIComponent(agent.ens)}`;
   const price = `$${agent.price_usd.toFixed(2)}`;
   const text = `Just found "${agent.display_name}" on sources.eth → ${agent.description} · ${price} per use, no wallet needed`;
 
@@ -267,7 +267,7 @@ export function AgentCard({ agent, rating, onSelect, selected }: AgentCardProps)
   }
 
   return (
-    <Link href={`/agent?ens=${encodeURIComponent(agent.ens)}`} className={cls}>
+    <Link href={`/agent/?ens=${encodeURIComponent(agent.ens)}`} className={cls}>
       {inner}
     </Link>
   );

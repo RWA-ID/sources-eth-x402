@@ -108,44 +108,6 @@ function LiveTickerEyebrow({ agents }: { agents: AgentManifest[] }) {
   );
 }
 
-function FloatingReceipt({ agent }: { agent: AgentManifest | null }) {
-  if (!agent) return null;
-  return (
-    <div
-      className="hidden xl:block absolute pointer-events-none"
-      style={{
-        right: -10,
-        top: 340,
-        width: 210,
-        transform: "rotate(4deg)",
-        animation: "float-y 6s ease-in-out infinite",
-      }}
-    >
-      <div className="p-4 bg-[#17130f] border border-white/[0.07] rounded-xl font-mono text-[11px] text-white/55 shadow-[0_30px_60px_-20px_rgba(0,0,0,0.5)]">
-        <div className="flex justify-between text-white/35 text-[10px]">
-          <span>receipt · base</span>
-          <span className="text-[#fdba74]">● paid</span>
-        </div>
-        <div className="h-px bg-white/[0.07] my-2.5" />
-        <div className="flex justify-between text-white/90">
-          <span className="truncate pr-2">{agent.name}</span>
-          <span className="text-[#fdba74] shrink-0">${agent.price_usd.toFixed(2)}</span>
-        </div>
-        <div className="text-white/35 text-[10px] mt-1.5">tx 0x82c…f9a3 · just now</div>
-        <div className="flex gap-1 mt-2.5">
-          {Array.from({ length: 20 }).map((_, i) => (
-            <div
-              key={i}
-              className="flex-1 h-[2px] rounded-[1px]"
-              style={{ background: i % 3 === 0 ? "#f97316" : "rgba(255,255,255,0.14)" }}
-            />
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function FauxQR({ size = 168 }: { size?: number }) {
   const cells = 25;
   const cell = size / cells;
@@ -197,7 +159,7 @@ function FauxQR({ size = 168 }: { size?: number }) {
   );
 }
 
-function HowItWorks({ heroAgent }: { heroAgent: AgentManifest | null }) {
+function HowItWorks() {
   return (
     <section id="how" className="py-24 px-7 border-t border-white/[0.07]">
       <div className="max-w-5xl mx-auto">
@@ -259,10 +221,10 @@ function HowItWorks({ heroAgent }: { heroAgent: AgentManifest | null }) {
             </div>
             <div className="px-4 pb-4 text-center font-mono text-xs">
               <div className="text-[#fdba74] text-base mb-0.5">
-                ${(heroAgent?.price_usd ?? 0.05).toFixed(2)} USDC
+                $0.05 USDC
               </div>
               <div className="text-white/35">
-                to {heroAgent?.name ?? "an agent"} on sources.eth
+                to an agent on sources.eth
               </div>
             </div>
           </Step>
@@ -397,7 +359,7 @@ function FeaturedAgentCard({ agent }: { agent: AgentManifest }) {
   const label = CATEGORY_LABEL[agent.category] ?? "Other";
   return (
     <a
-      href={`/agent?ens=${encodeURIComponent(agent.ens)}`}
+      href={`/agent/?ens=${encodeURIComponent(agent.ens)}`}
       className="group flex flex-col gap-4 p-[18px] bg-[#17130f] border border-white/[0.07] hover:border-[#f97316]/30 rounded-2xl transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-20px_rgba(249,115,22,0.22)]"
     >
       <div className="flex items-start justify-between gap-3">
@@ -439,7 +401,6 @@ export default function Home() {
   }, []);
 
   const tickerAgents = useMemo(() => featured.slice(0, 5), [featured]);
-  const receiptAgent = useMemo(() => featured[0] ?? null, [featured]);
 
   const handleSearch = useCallback(async (q: string) => {
     if (!q.trim()) {
@@ -521,7 +482,6 @@ export default function Home() {
         )}
 
         <div className="max-w-[1040px] mx-auto relative">
-          {!searched && <FloatingReceipt agent={receiptAgent} />}
 
           <div className="flex mb-6">
             <LiveTickerEyebrow agents={tickerAgents} />
@@ -651,7 +611,7 @@ export default function Home() {
       {!searched && (
         <>
           {/* HOW IT WORKS */}
-          <HowItWorks heroAgent={receiptAgent} />
+          <HowItWorks />
 
           {/* TRUST STRIP */}
           <section className="py-14 px-7 border-t border-b border-white/[0.07] bg-white/[0.012]">
